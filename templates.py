@@ -131,9 +131,8 @@ function listusers(id_sala){
             if (xmlObj.status === 200) {
             	var exemplo=JSON.parse(xmlObj.responseText)
             	if (exemplo["state"]== 0){
-            		alert("Nao esta ninguem na sala");
+            		alert("The room has no users");
             	}else{
-            		alert("Esta alguem na sala");
             		alert(JSON.stringify(exemplo["users"]));
             	}
             	//window.location.href= url
@@ -205,6 +204,8 @@ function checkinuser(usid ,idr) {
             	var exemplo=JSON.parse(xmlObj.responseText)
             	if (exemplo["state"]==1){
             		alert("you are now checked in")
+            	}else if(exemplo["state"]==-1){
+            		alert("You are already in this room")
             	}else{
             		alert("You are already in a room")
             		checkoutuser(usid)

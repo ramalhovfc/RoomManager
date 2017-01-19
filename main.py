@@ -105,7 +105,7 @@ def check_in_datase():
 
 		key_cr=ndb.Key(CheckRoom, int(roomid))
 		exemplo=key_cr.get()
-		if exemplo != None: #ja existiam utilziadores na sala, acrescentar o novo
+		if exemplo != None: #ja existiam utilizadores na sala, acrescentar o novo
 			buf = exemplo.userid
 			buf.append(int(userid))
 			exemplo.userid=buf
@@ -118,6 +118,8 @@ def check_in_datase():
 
 		resposta = json.dumps({'state': 1})
 
+	elif (user.checked_in == int(roomid)): #utilizador tenta fazer login na mesma sala
+		resposta = json.dumps({'state': -1})
 	else: #utilizador estava logado numa sala, primeiro fazer logout e depois voltar a fazer login 
 		resposta = json.dumps({'state': 0})
 
