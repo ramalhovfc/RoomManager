@@ -1,7 +1,7 @@
 index = '''
     	<h2>Welcome to Room Management</h2>
     	<form action="/" method="post">
-    		Username: <input name="username" type="text" /><br>
+    		Username: <input name="username" type="text" /><br><br>
     		<button type="submit" formaction="/login">Login</button>
 			<button type="submit" formaction="/signin">Signin</button>
     	</form>

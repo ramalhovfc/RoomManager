@@ -82,7 +82,7 @@ def roomsOcupancy():
 
 @bottle.route('/provideRoom/<roomId>/<roomName>', method="post")
 def provideRoom(roomId, roomName):
-	sala = Room(roomName = roomName, key = ndb.Key(Room, roomId))
+	sala = Room(roomName = roomName, key = ndb.Key(Room, int(roomId)))
 	sala.saveToCloud()
 
 @bottle.route('/admin/space/<id_space>')
@@ -100,31 +100,24 @@ def provideRoom(roomId):
 
 @bottle.route('/user/<uid:int>/rooms')
 def show_rooms(uid):
-	rooms=list_available_rooms()
-	id_rooms={}
-	id_rooms["rooms"]=rooms
-	id_rooms["id"]=uid
+	rooms = list_available_rooms()
+	id_rooms = {}
+	id_rooms["rooms"] = rooms
+	id_rooms["id"] = uid
 	print "rooms ---------------------------------------"
 	print rooms
-	return template(templates.temp, list= id_rooms, get_url = bottle.get_url)
+	return template(templates.temp, list = id_rooms, get_url = bottle.get_url)
 
 @bottle.route('/api/checkin', method ="post")
 def check_in_datase():
-	#roomid = request.forms.get('roomid')
-	#userid = request.forms.get('uid')
-
 	data = json.load(request.body)
 	roomid = data["roomid"]
 	userid = data["uid"]
 
-	print "Api funciona !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-	print userid, roomid
-	#falta fazer query na base de dados para ver se utilziador ja fez check in
-
-	key=ndb.Key(User, int(userid))
+	key = ndb.Key(User, int(userid))
 	user = key.get()
 
-	if (user.checked_in == -1): #O utilizador nao estava logado em nenhuma sala
+	if user.checked_in == -1: #O utilizador nao estava logado em nenhuma sala
 		user.checked_in = int(roomid)
 		user.put()
 
@@ -143,38 +136,21 @@ def check_in_datase():
 
 		resposta = json.dumps({'state': 1})
 
-	elif (user.checked_in == int(roomid)): #utilizador tenta fazer login na mesma sala
+	elif user.checked_in == int(roomid): #utilizador tenta fazer login na mesma sala
 		resposta = json.dumps({'state': -1})
 	else: #utilizador estava logado numa sala, primeiro fazer logout e depois voltar a fazer login
 		resposta = json.dumps({'state': 0})
 
 	return resposta
 
-	#user_exemplo = User(username = username, userid = userid, checked_in = True)
-	#user_exemplo.put()
-
 @bottle.route('/api/checkout', method="post")
 def check_out_database():
-	#roomid = request.forms.get('roomid')
-	#userid = request.forms.get('uid')
-	#recebido = json.loads(request.body)
-
-	userid2= json.load(request.body)
+	userid2 = json.load(request.body)
 	userid = userid2["uid"]
-	#print recebido
-	print "fazer checkout ~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	print userid
-	#key_cr=ndb.Key(CheckRoom, int(roomid))
-	#exemplo=key_cr.get()
 
-#	if (exemplo!=None): #retirar utilizador da sala e alterar o seu estado para nao checked in
-#		buf = exemplo.userid
-#		buf.remove(userid)
-#		exemplo.userid=buf
-#		exemplo.put()
-	key_u=ndb.Key(User, int(userid))
-	exemplo2=key_u.get()
-	roomid=exemplo2.checked_in
+	key_u = ndb.Key(User, int(userid))
+	exemplo2 = key_u.get()
+	roomid = exemplo2.checked_in
 	if roomid == -1: #verificar se esta logado numa sala
 		resposta = json.dumps({'state': 0})
 	else:
@@ -188,10 +164,6 @@ def check_out_database():
 		buf.remove(int(userid))
 		exemplo.userid=buf
 		exemplo.put()
-
-
-	#resposta = {'state': 1}
-	#resposta2=json.dumps(resposta)
 
 	return resposta
 
@@ -242,20 +214,17 @@ def signin_user(username):
 		return 0
 
 def login_user(username):
-	if username != "admin":
-		query=User.query().fetch()
-		for utilizador in query:
-			if utilizador.username == username:
-				return utilizador.userid
+	query = User.query().fetch()
+	for utilizador in query:
+		if utilizador.username == username:
+			return utilizador.userid
 
-		return -1
-	else:
-		return 0
+	return -1
 
 def convert_username(username):
-	query=User.query().fetch()
+	query = User.query().fetch()
 	for utilizador in query:
-		if username==utilizador.username:
+		if username == utilizador.username:
 			return username.userid
 
 	return -1
@@ -265,7 +234,7 @@ def list_available_rooms():
 	query = Room.query().fetch()
 	available_rooms = {}
 	for room in query:
-		available_rooms[room.roomId]=room.roomName
+		available_rooms[room.key]=room.roomName
 
 	return available_rooms
 
