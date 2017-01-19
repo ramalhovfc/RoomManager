@@ -1,5 +1,5 @@
 from google.appengine.ext import ndb
 
 class CheckRoom(ndb.Model):
-	userId = ndb.IntegerProperty(repeated=True)
-	roomId = ndb.IntegerProperty()
+	userid = ndb.IntegerProperty(repeated=True)
+	roomid = ndb.IntegerProperty()
