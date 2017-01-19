@@ -48,9 +48,17 @@ def user_actions():
 	return template(templates.logged_in, uid = userId, get_url = bottle.get_url)
 
 @bottle.route('/admin')
+def adminArea():
+	return template(templates.temp_adminArea)
+
+@bottle.route('/admin/spaces', method="get")
 def list_spaces():
 	spaces = fenixFetcher.getSpaceById()
 	return template(templates.temp_spaces, list = spaces)
+
+@bottle.route('/admin/roomsOcupancy', method="get")
+def roomsOcupancy():
+	return template(templates.temp_roomsOcupancy, list = roomsOcupancyImpl(), get_url = bottle.get_url)
 
 @bottle.route('/provideRoom/<roomId>/<roomName>', method="post")
 def provideRoom(roomId, roomName):
@@ -58,14 +66,13 @@ def provideRoom(roomId, roomName):
 
 @bottle.route('/isRoomProvided/<roomId>', method="get")
 def provideRoom(roomId):
-	return str(isRoomProvided(roomId))
+	return json.dumps(provideRoom(roomId))
 
-@bottle.route('/testing', method="post")
-def testing():
-	print "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-	return str(json.load(request.body))
+@bottle.route('/isRoomProvided/<roomId>', method="get")
+def provideRoom(roomId):
+	return json.dumps(isRoomProvided(roomId))
 
-@bottle.route('/0/space/<id_space>')
+@bottle.route('/admin/space/<id_space>')
 def buildings(id_space):
 	building = fenixFetcher.getSpaceById(id_space)
 	if (building["containedSpaces"] != []):
@@ -106,7 +113,6 @@ def check_in_datase():
 		checked_room.key = ndb.Key(CheckRoom, int(roomId))
 		checked_room.put()
 
-
 	key=ndb.Key(User, int(userId))
 	user = key.get()
 	user.checked_in = True
@@ -130,16 +136,28 @@ def check_out_database():
 	else: # a fazer depois quando o utilizador nao esta na sala
 		print("dsfasdfsdfas")
 
+def roomsOcupancyImpl():
+	checkIns = CheckRoom.query().fetch()
+
+	checkInByRoom = {}
+	for checkIn in checkIns:
+		if checkIn.roomId in checkInByRoom:
+			checkInByRoom[checkIn.roomId] = checkInByRoom[checkIn.roomId] + 1
+		else:
+			checkInByRoom[checkIn.roomId] = 1
+
+	return checkInByRoom
+
 def isRoomProvided(roomId):
 	try:
 		roomIdParsed = str(roomId)
 	except:
-		return str(False)
+		return {'roomProvided': False}
 
 	availableRooms = list_available_rooms()
 
 	response = {'roomProvided': roomIdParsed in availableRooms}
-	return json.dumps(response)
+	return response
 
 def login_user(username):
 #verifica se o username ja existe
@@ -159,7 +177,7 @@ def login_user(username):
 		user_exemplo.put()
 		return max_userId
 	else:
-		user_exemplo = User(username = username, userId = 0,  checked_in = False)
+		user_exemplo = User(username = username, userId = 0, checked_in = False)
 		user_exemplo.key = ndb.Key(User, max_userId)
 		user_exemplo.put()
 		return 0
@@ -178,7 +196,6 @@ def list_available_rooms():
 	available_rooms = {}
 	for room in query:
 		available_rooms[room.roomId]=room.roomName
-		print room.roomId," ",room.roomName
 
 	return available_rooms
 
@@ -188,6 +205,7 @@ def criar_sala(roomId, roomName):
 	sala.saveToCloud()
 
 #funcao de teste apagar
+@bottle.route('/criarCheckins', method="post")
 def inserir_user_sala():
 	room = CheckRoom(roomId = 89, userId =[1,2,3])
 	room.put()

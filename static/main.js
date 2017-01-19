@@ -18,7 +18,7 @@ function isRoomProvided(roomId) {
                     document.getElementById('provideButton').innerHTML = 'Room already provided'
                 }
             } else {
-                document.getElementById('provideButton').innerHTML = 'Something went wrong:' + xmlObj.statusText;
+                document.getElementById('provideButton').innerHTML = 'Something went wrong: ' + xmlObj.statusText;
                 console.error(xmlObj);
             }
         }
@@ -27,7 +27,7 @@ function isRoomProvided(roomId) {
         document.getElementById('provideButton').innerHTML += '.'
     }
     xmlObj.onerror = function (e) {
-        document.getElementById('provideButton').innerHTML = 'Something went wrong:' + e.statusText;
+        document.getElementById('provideButton').innerHTML = 'Something went wrong: ' + e.statusText;
         console.error(e);
     };
 
@@ -53,7 +53,7 @@ function provideRoom(roomId, roomName) {
                 document.getElementById('provideButton').innerHTML = 'Sucessfully added!'
                 document.getElementById('provideButton').disabled = true;
             } else {
-                document.getElementById('provideButton').innerHTML = 'Something went wrong:' + xmlObj.statusText;
+                document.getElementById('provideButton').innerHTML = 'Something went wrong: ' + xmlObj.statusText;
                 console.error(xmlObj);
             }
         }
@@ -62,7 +62,7 @@ function provideRoom(roomId, roomName) {
         document.getElementById('provideButton').innerHTML += '.'
     }
     xmlObj.onerror = function (e) {
-        document.getElementById('provideButton').innerHTML = 'Something went wrong:' + e.statusText;
+        document.getElementById('provideButton').innerHTML = 'Something went wrong: ' + e.statusText;
         console.error(e);
     };
 

@@ -13,5 +13,5 @@ class SpaceFetcher:
 			pathToGet = self.endpoint
 
 		result = requests.get(pathToGet)
-		building = json.loads(result.text)
-		return building
+		spaces = json.loads(result.text)
+		return spaces
