@@ -47,7 +47,7 @@ def do_login():
 		redirect("/user")
 
 @bottle.route('/signin', method="post")
-def do_login():
+def do_signin():
 	username = request.forms.get('username')
 	#print ("O teu username e", username)
 	userId = signin_user(username)
@@ -82,12 +82,13 @@ def roomsOcupancy():
 
 @bottle.route('/provideRoom/<roomId>/<roomName>', method="post")
 def provideRoom(roomId, roomName):
-	criar_sala(roomId, roomName)
+	sala = Room(roomName = roomName, key = ndb.Key(Room, roomId))
+	sala.saveToCloud()
 
 @bottle.route('/admin/space/<id_space>')
 def buildings(id_space):
 	building = fenixFetcher.getSpaceById(id_space)
-	if (building["containedSpaces"] != []):
+	if building["containedSpaces"] != []:
 		return template(templates.temp_spaces, list = building["containedSpaces"], get_url = bottle.get_url)
 	else:
 		print ("cheguei a uma sala para reservar!")
@@ -268,34 +269,4 @@ def list_available_rooms():
 
 	return available_rooms
 
-#apagar, funcao de teste
-def criar_sala(roomId, roomName):
-	sala = Room(roomId = roomId, roomName = roomName)
-	# 	sala_exemplo.key = ndb.Key(Room, 1234)
-	sala.saveToCloud()
 
-#funcao de teste apagar
-def inserir_user_sala():
-	room = CheckRoom(roomid = 89, userid =[1,2,3])
-	room.put()
-
-	"""room2 = CheckRoom(roomid = 89, userid = 2)
-	room2.put()
-
-	room3 = CheckRoom(roomid = 89, userid = 3)
-	room3.put()"""
-
-	room4 = CheckRoom(roomid = 1234, userid = [1])
-	room4.put()
-
-	room5 = CheckRoom(roomid = 567, userid = [1])
-	room5.put()
-
-	#room6 = CheckRoom(roomid = 1234, userid = 1)
-	#room6.put()
-
-
-"""if __name__=="__main__":
-	debug()
-	run(app, host='localhost', port=8080, reloader=True) #Run starts to build-in a development server
-"""
