@@ -77,9 +77,10 @@ temp_provide = """<ol>
 	Name : {{list["name"]}} <br>
 	Campus : {{list["parentSpace"]["topLevelSpace"]["name"]}}<br> <br>
 
-	<button id="provideButton" onclick="provideRoom({{list["id"]}}, \'{{list["name"]}}\')">Provide Room</button>
+	<button id="provideButton" onclick="provideRoom({{list["id"]}}, \'{{list["name"]}}\')" disabled	>Checking if room is already provided...</button>
 
 	<script type="text/javascript" src="{{ get_url('static', filename='main.js') }}"></script>
+	<script type="text/javascript"> isRoomProvided({{list["id"]}}) </script>
 </ol>"""
 
 temp_utilizadores= """

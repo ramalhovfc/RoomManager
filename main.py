@@ -54,7 +54,7 @@ def list_spaces():
 
 @bottle.route('/provideRoom/<roomId>/<roomName>', method="post")
 def provideRoom(roomId, roomName):
-	criar_sala(int(roomId), roomName)
+	criar_sala(roomId, roomName)
 
 @bottle.route('/isRoomProvided/<roomId>', method="get")
 def provideRoom(roomId):
@@ -132,12 +132,14 @@ def check_out_database():
 
 def isRoomProvided(roomId):
 	try:
-		roomIdParsed = int(roomId)
+		roomIdParsed = str(roomId)
 	except:
 		return str(False)
 
 	availableRooms = list_available_rooms()
-	return str(roomId in availableRooms)
+
+	response = {'roomProvided': roomIdParsed in availableRooms}
+	return json.dumps(response)
 
 def login_user(username):
 #verifica se o username ja existe
@@ -175,8 +177,8 @@ def list_available_rooms():
 	query = Room.query().fetch()
 	available_rooms = {}
 	for room in query:
-		available_rooms[room.key]=room.roomName
-		print room.key," ",room.roomName
+		available_rooms[room.roomId]=room.roomName
+		print room.roomId," ",room.roomName
 
 	return available_rooms
 
