@@ -193,7 +193,7 @@ def check_out_database():
 	#resposta2=json.dumps(resposta)
 
 	return resposta
-	
+
 @bottle.route('/api/listusers/<id_sala:int>')
 def show_listed_users(id_sala):
 
@@ -204,7 +204,7 @@ def show_listed_users(id_sala):
 
 	#print room.userid
 
-	if (room is None):
+	if (room is None or len(room.userid) ==0):
 		resposta = {'state':0, 'users':users} #Nao esta ninguem logado na sala 
 	else:
 		for userident in room.userid:

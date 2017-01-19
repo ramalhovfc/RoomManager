@@ -102,13 +102,12 @@ temp_login_user_doesnt_exists="""
 temp = """<ol type="1">
 	% for id_sala,name in list["rooms"].items():
 		<li> {{id_sala}} - {{name}} <button id= "{{id_sala}}" type="button" onclick=checkinuser({{list["id"]}},{{id_sala}})> Check in </button>
-		<button type="button" onclick=listusers({{id_sala}})> Show users </button></li>
+		<button id ="{{id_sala}}+s" type="button" onclick=listusers({{id_sala}})> Show users </button></li>
 	% end
 </ol>
 
 <script>
 function listusers(id_sala){
-	alert("lista de utilzadores logados");
 	/*var url = 'http://localhost:8080/api/listusers/'+id_sala;
 	//window.location.href= url
 	var xhttp = new XMLHttpRequest();
@@ -135,18 +134,17 @@ function listusers(id_sala){
                     //alert(JSON.stringify(usernames));
             	}
             	//window.location.href= url
-                //document.getElementById(id_sala).disabled = true;
             } else {
-                document.getElementById(id_sala).innerHTML = 'Something went wrong:' + xmlObj.statusText;
+                document.getElementById(id_sala+s).innerHTML = 'Something went wrong:' + xmlObj.statusText;
                 console.error(xmlObj);
             }
         }
     };
-    xmlObj.onprogress = function (e) {
-        document.getElementById(id_sala).innerHTML += '.'
-    }
+    /*xmlObj.onprogress = function (e) {
+        document.getElementById(id_sala+s).innerHTML += '.'
+    }*/
     xmlObj.onerror = function (e) {
-        document.getElementById(id_sala).innerHTML = 'Something went wrong:' + e.statusText;
+        document.getElementById(id_sala+s).innerHTML = 'Something went wrong:' + e.statusText;
         console.error(e);
     };
     xmlObj.send();
