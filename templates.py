@@ -32,7 +32,7 @@ logged_in = """
 
 		<br><a href="http://localhost:8080/user/{{uid}}/rooms">List Available Rooms</a>
 
-    	<br><br>You currently are in room <button type="button" onclick=checkoutuser({{uid}})> Check out </button> 
+    	<br><br>You currently are in room <button id="Checkoutb" type="button" onclick=checkoutuser({{uid}})> Check out </button> 
     	<div id='provideButton'>
 <script>
 function checkoutuser(uid) {
@@ -53,19 +53,19 @@ function checkoutuser(uid) {
             		alert("you were checked out")
             	}
 
-                document.getElementById('provideButton').disabled = true;
+                document.getElementById('Checkoutb').disabled = true;
             } else {
-                document.getElementById('provideButton').innerHTML = 'Something went wrong:' + xmlObj.statusText;
+                document.getElementById('Checkoutb').innerHTML = 'Something went wrong:' + xmlObj.statusText;
                 console.error(xmlObj);
             }
         }
     };
     xmlObj.onprogress = function (e) {
-        document.getElementById('provideButton').innerHTML += '.'
+        document.getElementById('Checkoutb').innerHTML += '.'
     }
     xmlObj.onerror = 
     function (e) {
-        document.getElementById('provideButton').innerHTML = 'Something went wrong:' + e.statusText;
+        document.getElementById('Checkoutb').innerHTML = 'Something went wrong:' + e.statusText;
         console.error(e);
     };
 
@@ -204,6 +204,8 @@ function checkinuser(usid ,idr) {
             	var exemplo=JSON.parse(xmlObj.responseText)
             	if (exemplo["state"]==1){
             		alert("you are now checked in")
+            		document.getElementById(idr).innerHTML = 'Sucessfully added!'
+            		//document.getElementById(idr).disabled = true;
             	}else if(exemplo["state"]==-1){
             		alert("You are already in this room")
             	}else{
@@ -212,7 +214,6 @@ function checkinuser(usid ,idr) {
             		alert("You are in a new room now")
             		checkinuser(usid, idr)
             	}
-                //document.getElementById(idr).disabled = true;
             } else {
                 document.getElementById(idr).innerHTML = 'Something went wrong:' + xmlObj.statusText;
                 console.error(xmlObj);
