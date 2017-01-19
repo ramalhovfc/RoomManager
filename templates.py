@@ -104,8 +104,6 @@ temp = """<ol type="1">
 		<li> {{id_sala}} - {{name}} <button id= "{{id_sala}}" type="button" onclick=checkinuser({{list["id"]}},{{id_sala}})> Check in </button>
 		<button type="button" onclick=listusers({{id_sala}})> Show users </button></li>
 	% end
-
-	//fazer div para mostrar template
 </ol>
 
 <script>
@@ -128,7 +126,13 @@ function listusers(id_sala){
             	if (exemplo["state"]== 0){
             		alert("The room has no users");
             	}else{
-            		alert(JSON.stringify(exemplo["users"]));
+            		//alert(JSON.stringify(exemplo["users"]));
+                    var users = []
+                    for (var key in exemplo["users"]){
+                        users.push(exemplo["users"][key])
+                    }
+                    alert(users)
+                    //alert(JSON.stringify(usernames));
             	}
             	//window.location.href= url
                 //document.getElementById(id_sala).disabled = true;
