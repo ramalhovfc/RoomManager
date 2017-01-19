@@ -193,6 +193,28 @@ def check_out_database():
 	#resposta2=json.dumps(resposta)
 
 	return resposta
+	
+@bottle.route('/api/listusers/<id_sala:int>')
+def show_listed_users(id_sala):
+
+	key=ndb.Key(CheckRoom, int(id_sala))
+	room=key.get()
+
+	users = {}
+
+	#print room.userid
+
+	if (room is None):
+		resposta = {'state':0, 'users':users} #Nao esta ninguem logado na sala 
+	else:
+		for userident in room.userid:
+			#print int(userident)
+			key_u=ndb.Key(User, int(userident))
+			user_all=key_u.get()
+			users[int(userident)]=user_all.username
+		resposta = {'state':1, 'users':users} #existem utilizadores logados na sala	
+
+	return  json.dumps(resposta) #nao esta a mudar de pagina com o template, javascript ver
 
 def roomsOcupancyImpl():
 	checkIns = CheckRoom.query().fetch()
