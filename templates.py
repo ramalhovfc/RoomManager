@@ -43,7 +43,10 @@ spaces = """
 			<li><a href="http://localhost:8080/admin/space/{{a["id"]}}"> {{a["name"]}} </a></li>
 		%end
 	% end
-</ol>"""
+</ol>
+
+<br><a href="http://localhost:8080/admin">Admin Menu</a>
+"""
 
 logged_in = """
 		<br><a href="http://localhost:8080/user/rooms">List Available Rooms</a>
@@ -85,6 +88,8 @@ provide = """
 	Campus : {{list["parentSpace"]["topLevelSpace"]["name"]}}<br> <br>
 
 	<button id="provideButton" onclick="provideRoom({{list["id"]}}, \'{{list["name"]}}\')" disabled	>Checking if room is already provided...</button>
+
+	<br><br><a href="http://localhost:8080/admin">Admin menu</a>
 
 	<script type="text/javascript" src="{{ get_url('static', filename='main.js') }}" ></script>
 	<script type="text/javascript"> isRoomProvided({{list["id"]}}) </script>
