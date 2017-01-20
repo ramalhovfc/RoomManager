@@ -62,7 +62,20 @@ def do_signin():
 
 @bottle.route('/user')
 def user_actions():
-	return template(templates.logged_in, uid = request.get_cookie("userId"), get_url = bottle.get_url)
+	userId = request.get_cookie("userId")
+
+	user_state = {}
+	user_state["uid"] = userId
+	#verifica se o utilizador esta nalguma sala
+	key=ndb.Key(User, int(userId))
+	user = key.get()
+
+	if user.checked_in == -1: #O utilizador nao estava logado em nenhuma sala
+		user_state["checked_in"]=0
+	else:
+		user_state["checked_in"]=1
+
+	return template(templates.logged_in, list = user_state, get_url = bottle.get_url)
 
 @bottle.route('/admin')
 def adminArea():
@@ -162,15 +175,37 @@ def check_out_database():
 
 	return resposta
 
+@bottle.route('/api/listusers/<id_sala:int>')
+def show_listed_users(id_sala):
+
+	key=ndb.Key(CheckRoom, int(id_sala))
+	room=key.get()
+
+	users = {}
+
+	#print room.userid
+
+	if (room is None or len(room.userid) ==0):
+		resposta = {'state':0, 'users':users} #Nao esta ninguem logado na sala
+	else:
+		for userident in room.userid:
+			#print int(userident)
+			key_u=ndb.Key(User, int(userident))
+			user_all=key_u.get()
+			users[int(userident)]=user_all.username
+		resposta = {'state':1, 'users':users} #existem utilizadores logados na sala
+
+	return  json.dumps(resposta) #nao esta a mudar de pagina com o template, javascript ver
+
 def roomsOcupancyImpl():
 	checkIns = CheckRoom.query().fetch()
 
 	checkInByRoom = {}
 	for checkIn in checkIns:
-		if checkIn.roomId in checkInByRoom:
-			checkInByRoom[checkIn.roomId] = checkInByRoom[checkIn.roomId] + 1
+		if checkIn.roomid in checkInByRoom:
+			checkInByRoom[checkIn.roomid] = checkInByRoom[checkIn.roomid] + 1
 		else:
-			checkInByRoom[checkIn.roomId] = 1
+			checkInByRoom[checkIn.roomid] = 1
 
 	return checkInByRoom
 
@@ -230,5 +265,3 @@ def list_available_rooms():
 		available_rooms[room.roomId]=room.roomName
 
 	return available_rooms
-
-

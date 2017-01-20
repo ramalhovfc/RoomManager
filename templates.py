@@ -46,11 +46,14 @@ spaces = """
 </ol>"""
 
 logged_in = """
-	<br><a href="http://localhost:8080/user/rooms">List Available Rooms</a>
+		<br><a href="http://localhost:8080/user/rooms">List Available Rooms</a>
 
-	<br><br>You currently are in room <button id="Checkoutb" type="button" onclick=checkoutuser({{uid}})> Check out </button>
-	<div id='provideButton'>
-	<script type="text/javascript" src="{{ get_url('static', filename='main.js') }}" ></script>
+    	% if(list["checked_in"]==0):
+        <br><br>You are not in a room <button id="Checkoutb" type="button" disabled onclick=checkoutuser({{list["uid"]}},1)> Check out </button>
+    	% else:
+        <br><br>You are in a room <button id="Checkoutb" type="button" onclick=checkoutuser({{list["uid"]}},1)> Check out </button>
+
+		<script type="text/javascript" src="{{ get_url('static', filename='main.js') }}" ></script>
 """
 
 failed_login="""
@@ -63,14 +66,13 @@ login_user_doesnt_exists="""
 	<br><br><a href="http://localhost:8080/">Back to login</a>
 """
 
-check_in = """
-<ol type="1">
-	% for id_sala, name in list["rooms"].items():
-		<li> {{id_sala}} - {{name}}
-			<button id="{{id_sala}}" type="button" onclick=checkinuser({{list["id"]}},{{id_sala}})> Check in </button>
-			<button type="button" onclick=listusers({{id_sala}})> Show users </button>
-		</li>
+check_in = """<ol type="1">
+	% for id_sala,name in list["rooms"].items():
+		<li> {{id_sala}} - {{name}} <button id= "{{id_sala}}" type="button" onclick=checkinuser({{list["id"]}},{{id_sala}},1)> Check in </button>
+		<button id ="{{id_sala}}+s" type="button" onclick=listusers({{id_sala}})> Show users </button></li>
 	% end
+
+    <br><a href="http://localhost:8080/user">Go Back</a>
 </ol>
 
 <script type="text/javascript" src="{{ get_url('static', filename='main.js') }}" ></script>
