@@ -35,7 +35,7 @@ def do_login():
 	userId = login_user(username)
 
 	if userId < 0: #username already exists
-		return template(templates.temp_login_user_doesnt_exists, username = username, get_url = bottle.get_url)
+		return template(templates.login_user_doesnt_exists, username = username, get_url = bottle.get_url)
 
 	elif userId == 0: #admin
 		response.set_cookie("userId", str(userId))
@@ -51,7 +51,7 @@ def do_signin():
 	userId = signin_user(username)
 
 	if userId < 0: #username already exists
-		return template(templates.temp_failed_login, username = username, get_url = bottle.get_url)
+		return template(templates.failed_login, username = username, get_url = bottle.get_url)
 
 	elif userId == 0: #admin
 		response.set_cookie("userId", str(userId))
@@ -66,16 +66,16 @@ def user_actions():
 
 @bottle.route('/admin')
 def adminArea():
-	return template(templates.temp_adminArea, get_url = bottle.get_url)
+	return template(templates.adminArea, get_url = bottle.get_url)
 
 @bottle.route('/admin/spaces', method="get")
 def list_spaces():
 	spaces = fenixFetcher.getSpaceById()
-	return template(templates.temp_spaces, list = spaces, get_url = bottle.get_url)
+	return template(templates.spaces, list = spaces, get_url = bottle.get_url)
 
 @bottle.route('/admin/roomsOcupancy', method="get")
 def roomsOcupancy():
-	return template(templates.temp_roomsOcupancy, list = roomsOcupancyImpl(), get_url = bottle.get_url)
+	return template(templates.roomsOcupancy, list = roomsOcupancyImpl(), get_url = bottle.get_url)
 
 @bottle.route('/provideRoom/<roomId>/<roomName>', method="post")
 def provideRoom(roomId, roomName):
@@ -86,10 +86,10 @@ def provideRoom(roomId, roomName):
 def buildings(id_space):
 	building = fenixFetcher.getSpaceById(id_space)
 	if building["containedSpaces"] != []:
-		return template(templates.temp_spaces, list = building["containedSpaces"], get_url = bottle.get_url)
+		return template(templates.spaces, list = building["containedSpaces"], get_url = bottle.get_url)
 	else:
 		print ("cheguei a uma sala para reservar!")
-		return template(templates.temp_provide, list = building, get_url = bottle.get_url)
+		return template(templates.provide, list = building, get_url = bottle.get_url)
 
 @bottle.route('/isRoomProvided/<roomId>', method="get")
 def provideRoom(roomId):
@@ -102,10 +102,10 @@ def show_rooms():
 	id_rooms = {}
 	id_rooms["rooms"] = rooms
 	id_rooms["id"] = uid
-	return template(templates.temp, list = id_rooms, get_url = bottle.get_url)
+	return template(templates.check_in, list = id_rooms, get_url = bottle.get_url)
 
 @bottle.route('/api/checkin', method ="post")
-def check_in_datase():
+def check_in_database():
 	data = json.load(request.body)
 	roomid = data["roomid"]
 	userid = data["uid"]

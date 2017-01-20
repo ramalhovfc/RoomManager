@@ -7,7 +7,7 @@ index = '''
     	</form>
 '''
 
-temp_adminArea = """
+adminArea = """
 	<h2>Administrator Area</h2>
 	<ol type="1">
 		<li><a href="http://localhost:8080/admin/spaces">Search spaces</a></li>
@@ -15,7 +15,7 @@ temp_adminArea = """
 	</ol>
 """
 
-temp_roomsOcupancy = """
+roomsOcupancy = """
 	<h2>Room Ocupancy</h2>
 	<table>
 		<tr>
@@ -31,7 +31,7 @@ temp_roomsOcupancy = """
 	</table>
 """
 
-temp_spaces = """
+spaces = """
 <ol type="1">
 	% if (list[0]["type"] == "FLOOR"):
 		Floors 	<br><br>
@@ -53,17 +53,17 @@ logged_in = """
 	<script type="text/javascript" src="{{ get_url('static', filename='main.js') }}" ></script>
 """
 
-temp_failed_login="""
+failed_login="""
 	The username - {{username}} is already in use please choose another one
 	<br><br><a href="http://localhost:8080/">Back to login</a>
 """
 
-temp_login_user_doesnt_exists="""
+login_user_doesnt_exists="""
 	The username - {{username}} is does not exist
 	<br><br><a href="http://localhost:8080/">Back to login</a>
 """
 
-temp = """
+check_in = """
 <ol type="1">
 	% for id_sala, name in list["rooms"].items():
 		<li> {{id_sala}} - {{name}}
@@ -76,7 +76,7 @@ temp = """
 <script type="text/javascript" src="{{ get_url('static', filename='main.js') }}" ></script>
 """
 
-temp_provide = """
+provide = """
 <ol>
 	Type : {{list["type"]}} <br>
 	Name : {{list["name"]}} <br>
@@ -88,7 +88,7 @@ temp_provide = """
 	<script type="text/javascript"> isRoomProvided({{list["id"]}}) </script>
 </ol>"""
 
-temp_utilizadores= """
+utilizadores= """
 	% for id, name in list.items():
 		{{id}}:{{name}}
 	% end
