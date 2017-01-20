@@ -65,7 +65,19 @@ def do_login():
 @bottle.route('/user')
 def user_actions():
 	userId = request.get_cookie("userId")
-	return template(templates.logged_in, uid = userId, get_url = bottle.get_url)
+
+	user_state={}
+	user_state["uid"]=userId
+	#verifica se o utilizador esta nalguma sala
+	key=ndb.Key(User, int(userId))
+	user = key.get()
+
+	if (user.checked_in == -1): #O utilizador nao estava logado em nenhuma sala
+		user_state["checked_in"]=0
+	else:
+		user_state["checked_in"]=1
+
+	return template(templates.logged_in, list = user_state, get_url = bottle.get_url)
 
 @bottle.route('/admin')
 def adminArea():
@@ -295,29 +307,3 @@ def criar_sala(roomId, roomName):
 	sala = Room(roomId = roomId, roomName = roomName)
 	# 	sala_exemplo.key = ndb.Key(Room, 1234)
 	sala.saveToCloud()
-
-#funcao de teste apagar
-def inserir_user_sala():
-	room = CheckRoom(roomid = 89, userid =[1,2,3])
-	room.put()
-
-	"""room2 = CheckRoom(roomid = 89, userid = 2)
-	room2.put()
-
-	room3 = CheckRoom(roomid = 89, userid = 3)
-	room3.put()"""
-
-	room4 = CheckRoom(roomid = 1234, userid = [1])
-	room4.put()
-
-	room5 = CheckRoom(roomid = 567, userid = [1])
-	room5.put()
-
-	#room6 = CheckRoom(roomid = 1234, userid = 1)
-	#room6.put()
-
-
-"""if __name__=="__main__":
-	debug()
-	run(app, host='localhost', port=8080, reloader=True) #Run starts to build-in a development server
-"""

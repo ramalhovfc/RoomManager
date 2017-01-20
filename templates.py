@@ -45,12 +45,14 @@ temp_spaces = """<ol type="1">
 </ol>"""
 
 logged_in = """
-		<br><a href="http://localhost:8080/user/{{uid}}/rooms">List Available Rooms</a>
+		<br><a href="http://localhost:8080/user/{{list["uid"]}}/rooms">List Available Rooms</a>
 
-    	<br><br>You currently are in room <button id="Checkoutb" type="button" onclick=checkoutuser({{uid}})> Check out </button>
-    	<div id='provideButton'>
+    	% if(list["checked_in"]==0):
+        <br><br>You are not in a room <button id="Checkoutb" type="button" disabled onclick=checkoutuser({{list["uid"]}},1)> Check out </button>
+    	% else:
+        <br><br>You are in a room <button id="Checkoutb" type="button" onclick=checkoutuser({{list["uid"]}},1)> Check out </button>
 <script>
-function checkoutuser(uid) {
+function checkoutuser(uid, message) {
 
     var url = 'http://localhost:8080/api/checkout';
     var userid = {uid: uid}
@@ -62,9 +64,9 @@ function checkoutuser(uid) {
         if (xmlObj.readyState === 4) {
             if (xmlObj.status === 200) {
             	var exemplo=JSON.parse(xmlObj.responseText)
-            	if (exemplo["state"]==0){
+            	if (exemplo["state"]=== 0 && message === 1){
             		alert("you are not checked in")
-            	}else{
+            	}else if(message === 1){
             		alert("you were checked out")
             	}
 
@@ -101,9 +103,11 @@ temp_login_user_doesnt_exists="""
 
 temp = """<ol type="1">
 	% for id_sala,name in list["rooms"].items():
-		<li> {{id_sala}} - {{name}} <button id= "{{id_sala}}" type="button" onclick=checkinuser({{list["id"]}},{{id_sala}})> Check in </button>
+		<li> {{id_sala}} - {{name}} <button id= "{{id_sala}}" type="button" onclick=checkinuser({{list["id"]}},{{id_sala}},1)> Check in </button>
 		<button id ="{{id_sala}}+s" type="button" onclick=listusers({{id_sala}})> Show users </button></li>
 	% end
+
+    <br><a href="http://localhost:8080/user">Go Back</a>
 </ol>
 
 <script>
@@ -131,7 +135,6 @@ function listusers(id_sala){
                         users.push(exemplo["users"][key])
                     }
                     alert(users)
-                    //alert(JSON.stringify(usernames));
             	}
             	//window.location.href= url
             } else {
@@ -149,7 +152,7 @@ function listusers(id_sala){
     };
     xmlObj.send();
 }
-function checkoutuser(uid) {
+function checkoutuser(uid, message) {
 
     var url = 'http://localhost:8080/api/checkout';
     var userid = {uid: uid}
@@ -161,9 +164,9 @@ function checkoutuser(uid) {
         if (xmlObj.readyState === 4) {
             if (xmlObj.status === 200) {
             	var exemplo=JSON.parse(xmlObj.responseText)
-            	if (exemplo["state"]==0){
+            	if (exemplo["state"]==0 && message === 1){
             		alert("you are not checked in")
-            	}else{
+            	}else if(message === 1){
             		alert("you were checked out")
             	}
 
@@ -185,7 +188,7 @@ function checkoutuser(uid) {
 
     xmlObj.send(JSON.stringify(userid));
 }
-function checkinuser(usid ,idr) {
+function checkinuser(usid ,idr, message) {
     var url = 'http://localhost:8080/api/checkin';
     var data = {uid: usid, roomid: idr};
     var xmlObj = new XMLHttpRequest();
@@ -196,16 +199,18 @@ function checkinuser(usid ,idr) {
             if (xmlObj.status === 200) {
             	var exemplo=JSON.parse(xmlObj.responseText)
             	if (exemplo["state"]==1){
-            		alert("you are now checked in")
+            		if (message==1){
+                        alert("you are now checked in")
+                    }
             		document.getElementById(idr).innerHTML = 'Sucessfully added!'
             		//document.getElementById(idr).disabled = true;
             	}else if(exemplo["state"]==-1){
             		alert("You are already in this room")
             	}else{
             		alert("You are already in a room")
-            		checkoutuser(usid)
+            		checkoutuser(usid, 0)
             		alert("You are in a new room now")
-            		checkinuser(usid, idr)
+            		checkinuser(usid, idr,0)
             	}
             } else {
                 document.getElementById(idr).innerHTML = 'Something went wrong:' + xmlObj.statusText;
