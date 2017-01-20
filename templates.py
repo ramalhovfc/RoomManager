@@ -51,7 +51,7 @@ logged_in = """
     	% if(list["checked_in"]==0):
         <br><br>You are not in a room <button id="Checkoutb" type="button" disabled onclick=checkoutuser({{list["uid"]}},1)> Check out </button>
     	% else:
-        <br><br>You are in a room <button id="Checkoutb" type="button" onclick=checkoutuser({{list["uid"]}},1)> Check out </button>
+        <br><br><span id="message">You are in a room </span><button id="Checkoutb" type="button" onclick=checkoutuser({{list["uid"]}},1)> Check out </button>
 
 		<script type="text/javascript" src="{{ get_url('static', filename='main.js') }}" ></script>
 """
