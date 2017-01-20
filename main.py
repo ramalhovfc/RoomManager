@@ -35,7 +35,7 @@ def do_login():
 	userId = login_user(username)
 
 	if userId < 0: #username already exists
-		return template(templates.temp_login_user_doesnt_exists, username = username)
+		return template(templates.temp_login_user_doesnt_exists, username = username, get_url = bottle.get_url)
 
 	elif userId == 0: #admin
 		response.set_cookie("userId", str(userId))
@@ -51,7 +51,7 @@ def do_signin():
 	userId = signin_user(username)
 
 	if userId < 0: #username already exists
-		return template(templates.temp_failed_login, username = username)
+		return template(templates.temp_failed_login, username = username, get_url = bottle.get_url)
 
 	elif userId == 0: #admin
 		response.set_cookie("userId", str(userId))
@@ -62,17 +62,16 @@ def do_signin():
 
 @bottle.route('/user')
 def user_actions():
-	userId = request.get_cookie("userId")
-	return template(templates.logged_in, uid = userId, get_url = bottle.get_url)
+	return template(templates.logged_in, uid = request.get_cookie("userId"), get_url = bottle.get_url)
 
 @bottle.route('/admin')
 def adminArea():
-	return template(templates.temp_adminArea)
+	return template(templates.temp_adminArea, get_url = bottle.get_url)
 
 @bottle.route('/admin/spaces', method="get")
 def list_spaces():
 	spaces = fenixFetcher.getSpaceById()
-	return template(templates.temp_spaces, list = spaces)
+	return template(templates.temp_spaces, list = spaces, get_url = bottle.get_url)
 
 @bottle.route('/admin/roomsOcupancy', method="get")
 def roomsOcupancy():
@@ -90,7 +89,7 @@ def buildings(id_space):
 		return template(templates.temp_spaces, list = building["containedSpaces"], get_url = bottle.get_url)
 	else:
 		print ("cheguei a uma sala para reservar!")
-		return template (templates.temp_provide, list = building, get_url = bottle.get_url)
+		return template(templates.temp_provide, list = building, get_url = bottle.get_url)
 
 @bottle.route('/isRoomProvided/<roomId>', method="get")
 def provideRoom(roomId):
