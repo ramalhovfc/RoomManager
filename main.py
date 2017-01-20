@@ -1,31 +1,29 @@
 from bottle import Bottle, run, template, request, response, debug, get, post, static_file, redirect
 from google.appengine.ext import ndb
-import requests
-import random
-import templates
 import requests_toolbelt.adapters.appengine
+import templates
 import json
-from google.appengine.ext import ndb
-
-from CheckRoom import CheckRoom
-from Room import Room
-from User import User
-from SpaceFetcher import SpaceFetcher
+import logging
 
 requests_toolbelt.adapters.appengine.monkeypatch()
 
-fenixFetcher = SpaceFetcher("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces")
+from SpaceFetcher import SpaceFetcher
+from CheckRoom import CheckRoom
+from Room import Room
+from User import User
 
+fenixFetcher = SpaceFetcher("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces")
 debug(True)
 
 # Create the Bottle WSGI application.
 bottle = Bottle()
 
+# servir javascript independentemente do url
 @bottle.route('/static/<filename>', name='static')
 def server_static(filename):
 	return static_file(filename, root='static')
 
-#ecra inicial e login do utilizador
+# ecra inicial e login do utilizador
 @bottle.route('/')
 def home():
 	return templates.index
@@ -37,7 +35,7 @@ def do_login():
 	userId = login_user(username)
 
 	if userId < 0: #username already exists
-		return template(templates.temp_login_user_doesnt_exists, username=username)
+		return template(templates.temp_login_user_doesnt_exists, username = username)
 
 	elif userId == 0: #admin
 		response.set_cookie("userId", str(userId))
@@ -53,7 +51,7 @@ def do_signin():
 	userId = signin_user(username)
 
 	if userId < 0: #username already exists
-		return template(templates.temp_failed_login, username=username)
+		return template(templates.temp_failed_login, username = username)
 
 	elif userId == 0: #admin
 		response.set_cookie("userId", str(userId))
@@ -82,7 +80,7 @@ def roomsOcupancy():
 
 @bottle.route('/provideRoom/<roomId>/<roomName>', method="post")
 def provideRoom(roomId, roomName):
-	sala = Room(roomName = roomName, key = ndb.Key(Room, int(roomId)))
+	sala = Room(roomName = roomName, roomId = roomId, key = ndb.Key(Room, int(roomId)))
 	sala.saveToCloud()
 
 @bottle.route('/admin/space/<id_space>')
@@ -98,14 +96,13 @@ def buildings(id_space):
 def provideRoom(roomId):
 	return json.dumps(isRoomProvided(roomId))
 
-@bottle.route('/user/<uid:int>/rooms')
-def show_rooms(uid):
+@bottle.route('/user/rooms')
+def show_rooms():
+	uid = request.get_cookie("userId")
 	rooms = list_available_rooms()
 	id_rooms = {}
 	id_rooms["rooms"] = rooms
 	id_rooms["id"] = uid
-	print "rooms ---------------------------------------"
-	print rooms
 	return template(templates.temp, list = id_rooms, get_url = bottle.get_url)
 
 @bottle.route('/api/checkin', method ="post")
@@ -121,8 +118,8 @@ def check_in_datase():
 		user.checked_in = int(roomid)
 		user.put()
 
-		key_cr=ndb.Key(CheckRoom, int(roomid))
-		exemplo=key_cr.get()
+		key_cr = ndb.Key(CheckRoom, int(roomid))
+		exemplo = key_cr.get()
 		if exemplo != None: #ja existiam utilizadores na sala, acrescentar o novo
 			buf = exemplo.userid
 			buf.append(int(userid))
@@ -130,8 +127,7 @@ def check_in_datase():
 			exemplo.put()
 
 		else: #ainda nao existia ninguem na sala
-			checked_room = CheckRoom(roomid = int(roomid), userid = [int(userid)])
-			checked_room.key = ndb.Key(CheckRoom, int(roomid))
+			checked_room = CheckRoom(roomid = int(roomid), userid = [int(userid)], key = ndb.Key(CheckRoom, int(roomid)))
 			checked_room.put()
 
 		resposta = json.dumps({'state': 1})
@@ -203,13 +199,11 @@ def signin_user(username):
 			if utilizador.username == username:
 				return -1
 		max_userId = max_userId + 1
-		user_exemplo = User(username = username, userid = max_userId, checked_in = -1)
-		user_exemplo.key = ndb.Key(User, max_userId)
+		user_exemplo = User(username = username, userid = max_userId, checked_in = -1, key = ndb.Key(User, max_userId))
 		user_exemplo.put()
 		return max_userId
 	else:
-		user_exemplo = User(username = username, userid = 0, checked_in = -1)
-		user_exemplo.key = ndb.Key(User, max_userId)
+		user_exemplo = User(username = username, userid = 0, checked_in = -1, key = ndb.Key(User, 0))
 		user_exemplo.put()
 		return 0
 
@@ -234,7 +228,7 @@ def list_available_rooms():
 	query = Room.query().fetch()
 	available_rooms = {}
 	for room in query:
-		available_rooms[room.key]=room.roomName
+		available_rooms[room.roomId]=room.roomName
 
 	return available_rooms
 

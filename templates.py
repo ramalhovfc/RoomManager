@@ -45,7 +45,7 @@ temp_spaces = """<ol type="1">
 </ol>"""
 
 logged_in = """
-		<br><a href="http://localhost:8080/user/{{uid}}/rooms">List Available Rooms</a>
+		<br><a href="http://localhost:8080/user/rooms">List Available Rooms</a>
 
     	<br><br>You currently are in room <button id="Checkoutb" type="button" onclick=checkoutuser({{uid}})> Check out </button>
     	<div id='provideButton'>
@@ -100,9 +100,11 @@ temp_login_user_doesnt_exists="""
 """
 
 temp = """<ol type="1">
-	% for id_sala,name in list["rooms"].items():
-		<li> {{id_sala}} - {{name}} <button id= "{{id_sala}}" type="button" onclick=checkinuser({{list["id"]}},{{id_sala}})> Check in </button>
-		<button type="button" onclick=listusers({{id_sala}})> Show users </button></li>
+	% for id_sala, name in list["rooms"].items():
+		<li> {{id_sala}} - {{name}}
+			<button id="{{id_sala}}" type="button" onclick=checkinuser({{list["id"]}},{{id_sala}})> Check in </button>
+			<button type="button" onclick=listusers({{id_sala}})> Show users </button>
+		</li>
 	% end
 </ol>
 
