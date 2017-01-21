@@ -2,7 +2,6 @@ from google.appengine.ext import ndb
 
 from User import User
 from CheckRoom import CheckRoom
-from Room import Room
 
 def signin_user_impl(username):
 	# verifica se o username ja existe
@@ -18,11 +17,11 @@ def signin_user_impl(username):
 				return -1
 		max_userId += 1
 		user_exemplo = User(username = username, userid = max_userId, checked_in = -1, key = ndb.Key(User, max_userId))
-		user_exemplo.put()
+		user_exemplo.saveToCloud()
 		return max_userId
 	else:
 		user_exemplo = User(username = username, userid = 0, checked_in = -1, key = ndb.Key(User, 0))
-		user_exemplo.put()
+		user_exemplo.saveToCloud()
 		return 0
 
 def login_user_impl(username):
@@ -43,20 +42,17 @@ def show_listed_users_impl(id_sala):
 	else:
 		for userident in room.userid:
 			#print int(userident)
-			key_u=ndb.Key(User, int(userident))
-			user_all=key_u.get()
-			users[int(userident)]=user_all.username
-		return {'state':1, 'users':users} # existem utilizadores logados na sala
+			key_u = ndb.Key(User, int(userident))
+			user_all = key_u.get()
+			users[int(userident)] = user_all.username
+		return {'state': 1, 'users': users} # existem utilizadores logados na sala
 
 def rooms_ocupancy_impl():
 	checkIns = CheckRoom.query().fetch()
 
 	checkInByRoom = {}
 	for checkIn in checkIns:
-		if checkIn.roomid in checkInByRoom:
-			checkInByRoom[checkIn.roomid] += 1
-		else:
-			checkInByRoom[checkIn.roomid] = 1
+		checkInByRoom[checkIn.roomid] = len(checkIn.userid)
 
 	return checkInByRoom
 
@@ -67,27 +63,27 @@ def check_in_database_impl(data):
 	key = ndb.Key(User, int(userid))
 	user = key.get()
 
-	if user.checked_in == -1: #O utilizador nao estava logado em nenhuma sala
+	if user.checked_in == -1: # O utilizador nao estava logado em nenhuma sala
 		user.checked_in = int(roomid)
-		user.put()
+		user.saveToCloud()
 
 		key_cr = ndb.Key(CheckRoom, int(roomid))
 		exemplo = key_cr.get()
-		if exemplo != None: #ja existiam utilizadores na sala, acrescentar o novo
+		if exemplo != None: # ja existiam utilizadores na sala, acrescentar o novo
 			buf = exemplo.userid
 			buf.append(int(userid))
 			exemplo.userid=buf
-			exemplo.put()
+			exemplo.saveToCloud()
 
-		else: #ainda nao existia ninguem na sala
+		else: # ainda nao existia ninguem na sala
 			checked_room = CheckRoom(roomid = int(roomid), userid = [int(userid)], key = ndb.Key(CheckRoom, int(roomid)))
-			checked_room.put()
+			checked_room.saveToCloud()
 
 		return {'state': 1}
 
-	elif user.checked_in == int(roomid): #utilizador tenta fazer login na mesma sala
+	elif user.checked_in == int(roomid): # utilizador tenta fazer login na mesma sala
 		return {'state': -1}
-	else: #utilizador estava logado numa sala, primeiro fazer logout e depois voltar a fazer login
+	else: # utilizador estava logado numa sala, primeiro fazer logout e depois voltar a fazer login
 		return {'state': 0}
 
 def check_out_database_impl(body):
@@ -96,18 +92,18 @@ def check_out_database_impl(body):
 	key_u = ndb.Key(User, int(userid))
 	exemplo2 = key_u.get()
 	roomid = exemplo2.checked_in
-	if roomid == -1: #verificar se esta logado numa sala
+	if roomid == -1: # verificar se esta logado numa sala
 		return {'state': 0}
 	else:
 		exemplo2.checked_in = -1
-		exemplo2.put()
+		exemplo2.saveToCloud()
 
 		key_cr = ndb.Key(CheckRoom, int(roomid))
 		exemplo = key_cr.get()
 		buf = exemplo.userid
 		buf.remove(int(userid))
 		exemplo.userid = buf
-		exemplo.put()
+		exemplo.saveToCloud()
 
 	return {'state': 1}
 
@@ -122,10 +118,6 @@ def is_room_provided_impl(roomId):
 	response = {'roomProvided': roomIdParsed in availableRooms}
 	return response
 
-def provideRoomImpl(roomId, roomName):
-	sala = Room(roomName = roomName, roomId = roomId, key = ndb.Key(Room, int(roomId)))
-	sala.saveToCloud()
-
 # get userId from username
 def convert_username(username):
 	query = User.query().fetch()
@@ -135,16 +127,16 @@ def convert_username(username):
 
 	return -1
 
-def provide_room_impl(roomId, roomName):
-	sala = Room(roomName = roomName, roomId = roomId, key = ndb.Key(Room, int(roomId)))
-	sala.saveToCloud()
+def provide_room_impl(roomid, roomname):
+	checked_room = CheckRoom(roomid = int(roomid), userid = [], roomname = roomname, key = ndb.Key(CheckRoom, int(roomid)))
+	checked_room.saveToCloud()
 
 # show available rooms to check_in
 def list_available_rooms():
-	query = Room.query().fetch()
+	query = CheckRoom.query().fetch()
 	available_rooms = {}
 	for room in query:
-		available_rooms[room.roomId]=room.roomName
+		available_rooms[room.roomid]=room.roomname
 
 	return available_rooms
 

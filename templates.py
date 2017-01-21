@@ -96,9 +96,3 @@ provide = """
 	<script type="text/javascript" src="{{ get_url('static', filename='main.js') }}" ></script>
 	<script type="text/javascript"> isRoomProvided({{list["id"]}}) </script>
 </ol>"""
-
-utilizadores= """
-	% for id, name in list.items():
-		{{id}}:{{name}}
-	% end
-"""
