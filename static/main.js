@@ -102,6 +102,7 @@ function listusers(id_sala){
     xmlObj.send();
 }
 function checkoutuser(uid, message) {
+    var checkoutButton = document.getElementById('Checkoutb');
     var url = 'http://localhost:8080/api/checkout';
     var userid = {uid: uid}
 
@@ -119,16 +120,19 @@ function checkoutuser(uid, message) {
             		alert("you were checked out")
             	}
 
-                document.getElementById('Checkoutb').disabled = true;
+                if (checkoutButton)
+                    checkoutButton.disabled = true;
             } else {
-                document.getElementById('Checkoutb').innerHTML = 'Something went wrong:' + xmlObj.statusText;
+                if (checkoutButton)
+                    document.getElementById('Checkoutb').innerHTML = 'Something went wrong:' + xmlObj.statusText;
                 console.error(xmlObj);
             }
         }
     };
 
     xmlObj.onerror = function (e) {
-        document.getElementById('Checkoutb').innerHTML = 'Something went wrong:' + e.statusText;
+        if (checkoutButton)
+            document.getElementById('Checkoutb').innerHTML = 'Something went wrong:' + e.statusText;
         console.error(e);
     };
 

@@ -17,6 +17,7 @@ bottle = Bottle()
 
 # TODO add checkroom when adding room
 # TODO feed js url through python
+# TODO logout button
 
 # servir javascript independentemente do url
 @bottle.route('/static/<filename>', name = 'static')
@@ -62,7 +63,7 @@ def do_signin():
 @bottle.route('/user')
 def user_actions():
 	userId = request.get_cookie("userId")
-	user_state = { "uid": userId, "user_state": mainImpl.is_user_checked_in(userId) }
+	user_state = { "uid": userId, "checked_in": mainImpl.is_user_checked_in(userId) }
 
 	return template(templates.logged_in, list = user_state, get_url = bottle.get_url)
 

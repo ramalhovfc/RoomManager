@@ -29,6 +29,8 @@ roomsOcupancy = """
 		</tr>
 	% end
 	</table>
+
+	<br><br><a href="http://localhost:8080/admin">Admin menu</a>
 """
 
 spaces = """

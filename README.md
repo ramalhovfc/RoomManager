@@ -1,2 +1,2 @@
 # RoomManager
-Initialization exercise to Bottle framework
+Initialization exercise to Python Bottle framework
