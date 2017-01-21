@@ -19,6 +19,7 @@ bottle = Bottle()
 # TODO feed js url through python
 # TODO logout button
 
+
 # servir javascript independentemente do url
 @bottle.route('/static/<filename>', name = 'static')
 def server_static(filename):
