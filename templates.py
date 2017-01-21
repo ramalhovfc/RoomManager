@@ -67,7 +67,7 @@ failed_login="""
 """
 
 login_user_doesnt_exists="""
-	The username - {{username}} is does not exist
+	The username - {{username}} does not exist, create it first
 	<br><br><a href="http://localhost:8080/">Back to login</a>
 """
 
@@ -96,9 +96,3 @@ provide = """
 	<script type="text/javascript" src="{{ get_url('static', filename='main.js') }}" ></script>
 	<script type="text/javascript"> isRoomProvided({{list["id"]}}) </script>
 </ol>"""
-
-utilizadores= """
-	% for id, name in list.items():
-		{{id}}:{{name}}
-	% end
-"""

@@ -152,8 +152,8 @@ function checkinuser(usid ,idr, message) {
             		if (message === 1){
                         alert("you are now checked in")
                     }
-            		document.getElementById(idr).innerHTML = 'Sucessfully added!'
-            		//document.getElementById(idr).disabled = true;
+            		//document.getElementById(idr).innerHTML = 'Sucessfully added!'
+                    //document.getElementById(idr).disabled = true;
             	}else if(exemplo["state"] === -1){
             		alert("You are already in this room")
             	}else{
