@@ -4,7 +4,6 @@ from User import User
 from CheckRoom import CheckRoom
 
 def signin_user_impl(username):
-	# verifica se o username ja existe
 	max_userId = 0
 	if username != "admin":
 		query = User.query().fetch()
@@ -32,20 +31,20 @@ def login_user_impl(username):
 
 	return -1
 
+#show the users in the room
 def show_listed_users_impl(id_sala):
 	key = ndb.Key(CheckRoom, int(id_sala))
 	room = key.get()
 	users = {}
 
-	if room is None or len(room.userid) == 0:
-		return {'state': 0, 'users': users} # Nao esta ninguem logado na sala
+	if room is None or len(room.userid) == 0: #there were no users in the room
+		return {'state': 0, 'users': users}
 	else:
 		for userident in room.userid:
-			#print int(userident)
 			key_u = ndb.Key(User, int(userident))
 			user_all = key_u.get()
 			users[int(userident)] = user_all.username
-		return {'state': 1, 'users': users} # existem utilizadores logados na sala
+		return {'state':1, 'users':users} # there were users in the room, return them
 
 def rooms_ocupancy_impl():
 	checkIns = CheckRoom.query().fetch()
@@ -56,6 +55,7 @@ def rooms_ocupancy_impl():
 
 	return checkInByRoom
 
+#check the user in the room if is a diferent one
 def check_in_database_impl(data):
 	roomid = data["roomid"]
 	userid = data["uid"]
@@ -63,7 +63,7 @@ def check_in_database_impl(data):
 	key = ndb.Key(User, int(userid))
 	user = key.get()
 
-	if user.checked_in == -1: # O utilizador nao estava logado em nenhuma sala
+	if user.checked_in == -1: #the user was not in any room
 		user.checked_in = int(roomid)
 		user.saveToCloud()
 
@@ -74,13 +74,14 @@ def check_in_database_impl(data):
 		exemplo.userid = buf
 		exemplo.saveToCloud()
 
-		return {'state': 1}
+		return {'state': 201}
 
 	elif user.checked_in == int(roomid): # utilizador tenta fazer login na mesma sala
-		return {'state': -1}
+		return {'state': 400}
 	else: # utilizador estava logado numa sala, primeiro fazer logout e depois voltar a fazer login
-		return {'state': 0}
+		return {'state': 409}
 
+#checkout the user from the room if it is in one
 def check_out_database_impl(body):
 	userid = body["uid"]
 
@@ -88,19 +89,19 @@ def check_out_database_impl(body):
 	exemplo2 = key_u.get()
 	roomid = exemplo2.checked_in
 	if roomid == -1: # verificar se esta logado numa sala
-		return {'state': 0}
+		return {'state': 404}
 	else:
 		exemplo2.checked_in = -1
 		exemplo2.saveToCloud()
 
 		key_cr = ndb.Key(CheckRoom, int(roomid))
-		exemplo = key_cr.get()
-		buf = exemplo.userid
+		room = key_cr.get()
+		buf = room.userid
 		buf.remove(int(userid))
-		exemplo.userid = buf
-		exemplo.saveToCloud()
+		room.userid = buf
+		room.saveToCloud()
 
-	return {'state': 1}
+	return {'state': 200}
 
 def is_room_provided_impl(roomId):
 	try:
@@ -120,7 +121,7 @@ def convert_username(username):
 	queryResult = User.query(ndb.GenericProperty('username') == username).fetch()
 
 	if queryResult is None:
-		return -1
+		return -1 #username didn't exist
 	else:
 		return queryResult.username
 
@@ -137,12 +138,12 @@ def list_available_rooms():
 
 	return available_rooms
 
+#verify if the user is in a room
 def is_user_checked_in(userId):
-	# verifica se o utilizador esta nalguma sala
 	key = ndb.Key(User, int(userId))
 	user = key.get()
 
-	if user.checked_in == -1: # O utilizador nao estava logado em nenhuma sala
+	if user.checked_in == -1: #the user was not in a room
 		return 0
 	else:
-		return 1
+		return user.checked_in #return the id of the room where the user is

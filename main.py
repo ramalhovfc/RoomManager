@@ -115,22 +115,30 @@ def buildings(id_space):
 def is_room_provided(roomId):
 	return json.dumps({"roomProvided": mainImpl.is_room_provided_impl(roomId)})
 
-@bottle.route('/user/rooms')
+@bottle.route('/api/user/rooms', method = 'get')
+@bottle.route('/user/rooms', method ="get")
 def show_rooms():
 	uid = request.get_cookie("userId")
 	rooms = mainImpl.list_available_rooms()
 	id_rooms = { "rooms": rooms, "id": uid }
-	return template(templates.check_in, list = id_rooms, get_url = bottle.get_url)
 
-@bottle.route('/api/checkin', method = "post")
+	if (request['bottle.route'].rule == '/user/rooms'): #accessed from the browser, return the template
+		return template(templates.check_in, list = id_rooms, get_url = bottle.get_url) 
+	elif (request['bottle.route'].rule == '/api/user/rooms'): #just the rest answer
+		return id_rooms
+
+
+@bottle.route('/api/checkin', method = "put")
 def check_in_database():
+	print "------------------------------------"
+	print json.load(request.body)
 	return json.dumps(mainImpl.check_in_database_impl(json.load(request.body)))
 
-@bottle.route('/api/checkout', method = "post")
+@bottle.route('/api/checkout', method = "put")
 def check_out_database():
 	return json.dumps(mainImpl.check_out_database_impl(json.load(request.body)))
 
-@bottle.route('/api/listusers/<id_sala:int>')
+@bottle.route('/api/listusers/<id_sala:int>', method = "get")
 def show_listed_users(id_sala):
 	return json.dumps(mainImpl.show_listed_users_impl(id_sala))
 
