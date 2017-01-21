@@ -69,15 +69,10 @@ def check_in_database_impl(data):
 
 		key_cr = ndb.Key(CheckRoom, int(roomid))
 		exemplo = key_cr.get()
-		if exemplo != None: # ja existiam utilizadores na sala, acrescentar o novo
-			buf = exemplo.userid
-			buf.append(int(userid))
-			exemplo.userid=buf
-			exemplo.saveToCloud()
-
-		else: # ainda nao existia ninguem na sala
-			checked_room = CheckRoom(roomid = int(roomid), userid = [int(userid)], key = ndb.Key(CheckRoom, int(roomid)))
-			checked_room.saveToCloud()
+		buf = exemplo.userid
+		buf.append(int(userid))
+		exemplo.userid = buf
+		exemplo.saveToCloud()
 
 		return {'state': 1}
 

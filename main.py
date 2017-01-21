@@ -2,6 +2,7 @@ from bottle import Bottle, template, request, response, debug, static_file, redi
 import requests_toolbelt.adapters.appengine
 import templates
 import json
+import logging
 
 requests_toolbelt.adapters.appengine.monkeypatch()
 
@@ -15,9 +16,7 @@ debug(True)
 # Create the Bottle WSGI application.
 bottle = Bottle()
 
-# TODO add checkroom when adding room
 # TODO feed js url through python
-# TODO logout button
 # TODO normalize endpoints
 # TODO dont get all entities from db. do a filtered query
 
@@ -29,12 +28,17 @@ def server_static(filename):
 # ecra inicial e login do utilizador
 @bottle.route('/')
 def home():
+	response.set_cookie('userId', '', expires = 0)
 	return templates.index
+
+@bottle.route('/logout')
+def do_logout():
+	response.set_cookie('userId', '', expires = 0)
+	redirect("/")
 
 @bottle.route('/login', method = "post")
 def do_login():
 	username = request.forms.get('username')
-	#print ("O teu username e", username)
 	userId = mainImpl.login_user_impl(username)
 
 	if userId < 0: # username already exists
@@ -65,12 +69,20 @@ def do_signin():
 @bottle.route('/user')
 def user_actions():
 	userId = request.get_cookie("userId")
+
+	if userId is None or userId == "" or userId == "0":
+		return template(templates.notLoggedIn, get_url = bottle.get_url)
+
 	user_state = { "uid": userId, "checked_in": mainImpl.is_user_checked_in(userId) }
 
 	return template(templates.logged_in, list = user_state, get_url = bottle.get_url)
 
 @bottle.route('/admin')
 def adminArea():
+	userId = request.get_cookie("userId")
+	if userId != "0":
+		return template(templates.notAdmin, get_url = bottle.get_url)
+
 	return template(templates.adminArea, get_url = bottle.get_url)
 
 @bottle.route('/admin/spaces', method = "get")

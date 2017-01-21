@@ -13,6 +13,14 @@ adminArea = """
 		<li><a href="http://localhost:8080/admin/spaces">Search spaces</a></li>
 		<li><a href="http://localhost:8080/admin/roomsOcupancy">List room ocupancy</a></li>
 	</ol>
+
+	<br><a href="http://localhost:8080/logout"> Logout </a>
+"""
+
+notAdmin = """
+	You are not an administrator!
+
+	<br><br><a href="http://localhost:8080"> Login page </a>
 """
 
 roomsOcupancy = """
@@ -58,11 +66,18 @@ logged_in = """
     	% else:
         <br><br><span id="message">You are in a room </span><button id="Checkoutb" type="button" onclick=checkoutuser({{list["uid"]}},1)> Check out </button>
 
+		<br><br><a href="http://localhost:8080/logout"> Logout </a>
+
 		<script type="text/javascript" src="{{ get_url('static', filename='main.js') }}" ></script>
 """
 
 failed_login="""
 	The username - {{username}} is already in use please choose another one
+	<br><br><a href="http://localhost:8080/">Back to login</a>
+"""
+
+notLoggedIn = """
+	You are not logged in as a user
 	<br><br><a href="http://localhost:8080/">Back to login</a>
 """
 
