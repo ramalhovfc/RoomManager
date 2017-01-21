@@ -152,15 +152,10 @@ function checkinuser(usid ,idr, message) {
             		if (message === 1){
                         alert("you are now checked in")
                     }
-            		//document.getElementById(idr).innerHTML = 'Sucessfully added!'
-                    //document.getElementById(idr).disabled = true;
             	}else if(exemplo["state"] === 400){
             		alert("You are already in this room")
-            	}else{
-            		alert("You are already in a room")
-            		checkoutuser(usid, 0)
-            		alert("You are in a new room now")
-            		checkinuser(usid, idr, 0)
+            	}else if (exemplo["state"]==200){
+                    alert("You are now in a different room")
             	}
             } else {
                 document.getElementById(idr).innerHTML = 'Something went wrong:' + xmlObj.statusText;
