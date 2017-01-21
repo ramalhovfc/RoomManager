@@ -110,8 +110,6 @@ def show_rooms():
 
 @bottle.route('/api/checkin', method = "put")
 def check_in_database():
-	print "------------------------------------"
-	print json.load(request.body)
 	return json.dumps(mainImpl.check_in_database_impl(json.load(request.body)))
 
 @bottle.route('/api/checkout', method = "put")

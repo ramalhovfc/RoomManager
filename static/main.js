@@ -80,7 +80,7 @@ function listusers(id_sala){
         if (xmlObj.readyState === 4) {
             if (xmlObj.status === 200) {
             	var exemplo=JSON.parse(xmlObj.responseText)
-            	if (exemplo["state"] === 0){
+            	if (exemplo["state"] === 404){
             		alert("The room has no users");
             	} else {
                     var users = []

@@ -39,13 +39,13 @@ def show_listed_users_impl(id_sala):
 	users = {}
 
 	if room is None or len(room.userid) == 0: #there were no users in the room
-		return {'state': 0, 'users': users} 
+		return {'state': 404, 'users': users} 
 	else:
 		for userident in room.userid:
 			key_u=ndb.Key(User, int(userident))
 			user_all=key_u.get()
 			users[int(userident)]=user_all.username
-		return {'state':1, 'users':users} # there were users in the room, return them
+		return {'state':200, 'users':users} # there were users in the room, return them
 
 def rooms_ocupancy_impl():
 	checkIns = CheckRoom.query().fetch()
@@ -66,29 +66,31 @@ def check_in_database_impl(data):
 
 	key = ndb.Key(User, int(userid))
 	user = key.get()
+	if user != None: #check if the user is in the database
+		if user.checked_in == -1: #the user was not in any room
+			user.checked_in = int(roomid)
+			user.put()
 
-	if user.checked_in == -1: #the user was not in any room
-		user.checked_in = int(roomid)
-		user.put()
+			key_cr = ndb.Key(CheckRoom, int(roomid))
+			room = key_cr.get()
+			if room != None: #there were users in the rooms add the new one
+				buf = room.userid
+				buf.append(int(userid))
+				room.userid=buf
+				room.put()
 
-		key_cr = ndb.Key(CheckRoom, int(roomid))
-		room = key_cr.get()
-		if room != None: #there were users in the rooms add the new one
-			buf = room.userid
-			buf.append(int(userid))
-			room.userid=buf
-			room.put()
+			else: #there was no one in the room
+				checked_room = CheckRoom(roomid = int(roomid), userid = [int(userid)], key = ndb.Key(CheckRoom, int(roomid)))
+				checked_room.put()
 
-		else: #there was no one in the room
-			checked_room = CheckRoom(roomid = int(roomid), userid = [int(userid)], key = ndb.Key(CheckRoom, int(roomid)))
-			checked_room.put()
+			return {'state': 201}
 
-		return {'state': 201}
-
-	elif user.checked_in == int(roomid): #utilizador tenta fazer login na mesma sala
-		return {'state': 400}
-	else: #utilizador estava logado numa sala, primeiro fazer logout e depois voltar a fazer login
-		return {'state': 409}
+		elif user.checked_in == int(roomid): #utilizador tenta fazer login na mesma sala
+			return {'state': 400}
+		else: #utilizador estava logado numa sala, primeiro fazer logout e depois voltar a fazer login
+			return {'state': 409}
+	else:
+		return {'state': 404}
 
 #checkout the user from the room if it is in one
 def check_out_database_impl(body):
@@ -96,21 +98,24 @@ def check_out_database_impl(body):
 
 	key_u = ndb.Key(User, int(userid))
 	user = key_u.get()
-	roomid = user.checked_in
-	if roomid == -1: #the user was not in a room
+	if (user!=None): #check if user exists
+		roomid = user.checked_in
+		if roomid == -1: #the user was not in a room
+			return {'state': 404}
+		else: #the user was in a room, remove it
+			user.checked_in = -1
+			user.put()
+
+			key_cr = ndb.Key(CheckRoom, int(roomid))
+			room = key_cr.get()
+			buf = room.userid
+			buf.remove(int(userid))
+			room.userid = buf
+			room.put()
+		return {'state': 200}
+
+	else:
 		return {'state': 404}
-	else: #the user was in a room, remove it
-		user.checked_in = -1
-		user.put()
-
-		key_cr = ndb.Key(CheckRoom, int(roomid))
-		room = key_cr.get()
-		buf = room.userid
-		buf.remove(int(userid))
-		room.userid = buf
-		room.put()
-
-	return {'state': 200}
 
 def is_room_provided_impl(roomId):
 	try:
