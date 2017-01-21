@@ -52,7 +52,7 @@ def rooms_ocupancy_impl():
 
 	checkInByRoom = {}
 	for checkIn in checkIns:
-		checkInByRoom[checkIn.roomid] = len(checkIn.userid)
+		checkInByRoom[checkIn.roomid] = {"ocupancy": len(checkIn.userid), "roomname": checkIn.roomname}
 
 	return checkInByRoom
 
@@ -104,14 +104,16 @@ def check_out_database_impl(body):
 
 def is_room_provided_impl(roomId):
 	try:
-		roomIdParsed = str(roomId)
+		roomIdParsed = int(roomId)
 	except:
-		return {'roomProvided': False}
+		return False
 
-	availableRooms = list_available_rooms()
-
-	response = {'roomProvided': roomIdParsed in availableRooms}
-	return response
+	key = ndb.Key(CheckRoom, roomIdParsed)
+	room = key.get()
+	if room is None:
+		return False
+	else:
+		return True
 
 # get userId from username
 def convert_username(username):
@@ -131,7 +133,7 @@ def list_available_rooms():
 	query = CheckRoom.query().fetch()
 	available_rooms = {}
 	for room in query:
-		available_rooms[room.roomid]=room.roomname
+		available_rooms[room.roomid] = room.roomname
 
 	return available_rooms
 

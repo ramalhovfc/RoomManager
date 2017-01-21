@@ -1,7 +1,7 @@
 function isRoomProvided(roomId) {
     console.log('checking id', roomId)
 
-    var url = 'http://localhost:8080/isRoomProvided/' + roomId;
+    var url = 'http://localhost:8080/admin/spaces/provided/' + roomId;
 
     var xmlObj = new XMLHttpRequest();
     xmlObj.open('GET', url, true);
@@ -41,7 +41,7 @@ function provideRoom(roomId, roomName) {
 	console.log('providing id', roomId)
 	console.log('providing name', roomName)
 
-    var url = 'http://localhost:8080/api/provideRoom/' + roomId + '/' + roomName;
+    var url = 'http://localhost:8080/api/spaces/provide/' + roomId + '/' + roomName;
 
     var xmlObj = new XMLHttpRequest();
     xmlObj.open('POST', url, true);

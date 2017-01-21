@@ -87,27 +87,35 @@ def adminArea():
 
 @bottle.route('/admin/spaces', method = "get")
 def list_spaces():
-	return template(templates.spaces, list = fenixFetcher.getSpaceById(), get_url = bottle.get_url)
+	try:
+		building = fenixFetcher.getSpaceById()
+	except:
+		return template(templates.errorGettingSpaces)
+	return template(templates.spaces, list = building, get_url = bottle.get_url)
 
-@bottle.route('/admin/roomsOcupancy', method = "get")
+@bottle.route('/admin/spaces/ocupancy')
 def roomsOcupancy():
 	return template(templates.roomsOcupancy, list = mainImpl.rooms_ocupancy_impl(), get_url = bottle.get_url)
 
-@bottle.route('/api/provideRoom/<roomId>/<roomName>', method= "post")
+@bottle.route('/api/spaces/provide/<roomId>/<roomName>', method= "post")
 def provideRoom(roomId, roomName):
 	mainImpl.provide_room_impl(roomId, roomName)
 
 @bottle.route('/admin/space/<id_space>')
 def buildings(id_space):
-	building = fenixFetcher.getSpaceById(id_space)
+	try:
+		building = fenixFetcher.getSpaceById(id_space)
+	except:
+		return template(templates.errorGettingSpaces)
+
 	if building["containedSpaces"] != []:
 		return template(templates.spaces, list = building["containedSpaces"], get_url = bottle.get_url)
 	else:
 		return template(templates.provide, list = building, get_url = bottle.get_url)
 
-@bottle.route('/isRoomProvided/<roomId>', method = "get")
+@bottle.route('/admin/spaces/provided/<roomId>')
 def is_room_provided(roomId):
-	return json.dumps(mainImpl.is_room_provided_impl(roomId))
+	return json.dumps({"roomProvided": mainImpl.is_room_provided_impl(roomId)})
 
 @bottle.route('/user/rooms')
 def show_rooms():

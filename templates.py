@@ -11,7 +11,7 @@ adminArea = """
 	<h2>Administrator Area</h2>
 	<ol type="1">
 		<li><a href="http://localhost:8080/admin/spaces">Search spaces</a></li>
-		<li><a href="http://localhost:8080/admin/roomsOcupancy">List room ocupancy</a></li>
+		<li><a href="http://localhost:8080/admin/spaces/ocupancy">List room ocupancy</a></li>
 	</ol>
 
 	<br><a href="http://localhost:8080/logout"> Logout </a>
@@ -28,15 +28,23 @@ roomsOcupancy = """
 	<table>
 		<tr>
 			<th>Room Id</th>
+			<th>Room Name</th>
 			<th>Ocupancy</th>
 		</tr>
 	% for key, value in list.items():
 		<tr>
 			<td>{{key}}</td>
-			<td>{{value}}</td>
+			<td>{{value["roomname"]}}</td>
+			<td>{{value["ocupancy"]}}</td>
 		</tr>
 	% end
 	</table>
+
+	<br><br><a href="http://localhost:8080/admin">Admin menu</a>
+"""
+
+errorGettingSpaces = """
+	Error getting spaces from external system
 
 	<br><br><a href="http://localhost:8080/admin">Admin menu</a>
 """
