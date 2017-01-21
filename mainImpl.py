@@ -70,7 +70,6 @@ def check_in_database_impl(data):
 		if user.checked_in == -1: #the user was not in any room
 			user.checked_in = int(roomid)
 			user.put()
-
 			key_cr = ndb.Key(CheckRoom, int(roomid))
 			room = key_cr.get()
 			if room != None: #there were users in the rooms add the new one
@@ -85,9 +84,18 @@ def check_in_database_impl(data):
 
 			return {'state': 201}
 
-		elif user.checked_in == int(roomid): #utilizador tenta fazer login na mesma sala
+		elif user.checked_in == int(roomid): #user try to log in the same room
 			return {'state': 400}
-		else: #utilizador estava logado numa sala, primeiro fazer logout e depois voltar a fazer login
+		else: #user was already logged in a room first logout then log in in the new one
+			response=check_out_database_impl({'uid':userid})
+			if (response['state']==200):
+				response2=check_in_database_impl({'uid':userid, 'roomid':roomid})
+				if (response2['state']==201):
+					return {'state':200}
+				else:
+					return {'state':400}
+			else:
+				return {'state': 400}
 			return {'state': 409}
 	else:
 		return {'state': 404}
