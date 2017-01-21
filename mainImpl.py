@@ -81,7 +81,7 @@ def check_in_database_impl(data):
 				checked_room = CheckRoom(roomid = int(roomid), userid = [int(userid)], key = ndb.Key(CheckRoom, int(roomid)))
 				checked_room.saveToCloud()
 
-				return {'state': 201}
+			return {'state': 201}
 
 		elif user.checked_in == int(roomid): #utilizador tenta fazer login na mesma sala
 			return {'state': 400}

@@ -94,7 +94,7 @@ notLoggedIn = """
 """
 
 #template when the username of the login doesn't exist in the database
-login_user_doesnt_exists="""
+login_user_doesnt_exist="""
 	The username {{username}} does not exist, create it first
 	<br><br><a href="http://localhost:8080/">Back to login</a>
 """

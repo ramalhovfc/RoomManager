@@ -1,4 +1,4 @@
-from bottle import Bottle, template, request, response, debug, static_file, redirect
+from bottle import Bottle, template, request, response, debug, static_file, redirect, HTTPResponse
 import requests_toolbelt.adapters.appengine
 import templates
 import json
@@ -35,21 +35,24 @@ def do_logout():
 	redirect("/")
 
 @bottle.route('/login', method = "post")
+@bottle.route('/api/login', method = "post")
 def do_login():
 	username = request.forms.get('username')
 	userId = mainImpl.login_user_impl(username)
 
-	if userId < 0: # username already exists
-		return template(templates.login_user_doesnt_exists, username = username, get_url = bottle.get_url)
+	if userId < 0: # username does not exist
+		return template(templates.login_user_doesnt_exist, username = username, get_url = bottle.get_url)
 
 	elif userId == 0: # admin
 		response.set_cookie("userId", str(userId))
 		redirect("/admin")
+
 	elif userId > 0: # regular user with valid username
 		response.set_cookie("userId", str(userId))
 		redirect("/user")
 
 @bottle.route('/signin', method = "post")
+@bottle.route('/api/signin', method = "post")
 def do_signin():
 	username = request.forms.get('username')
 	userId = mainImpl.signin_user_impl(username)
