@@ -83,12 +83,12 @@ def check_in_database_impl(data):
 			checked_room = CheckRoom(roomid = int(roomid), userid = [int(userid)], key = ndb.Key(CheckRoom, int(roomid)))
 			checked_room.put()
 
-		return {'state': 1}
+		return {'state': 201}
 
 	elif user.checked_in == int(roomid): #utilizador tenta fazer login na mesma sala
-		return {'state': -1}
+		return {'state': 400}
 	else: #utilizador estava logado numa sala, primeiro fazer logout e depois voltar a fazer login
-		return {'state': 0}
+		return {'state': 409}
 
 def check_out_database_impl(body):
 	userid = body["uid"]
@@ -97,7 +97,7 @@ def check_out_database_impl(body):
 	exemplo2 = key_u.get()
 	roomid = exemplo2.checked_in
 	if roomid == -1: #verificar se esta logado numa sala
-		return {'state': 0}
+		return {'state': 404}
 	else:
 		exemplo2.checked_in = -1
 		exemplo2.put()
@@ -109,7 +109,7 @@ def check_out_database_impl(body):
 		exemplo.userid = buf
 		exemplo.put()
 
-	return {'state': 1}
+	return {'state': 200}
 
 def is_room_provided_impl(roomId):
 	try:

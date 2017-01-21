@@ -107,13 +107,13 @@ function checkoutuser(uid, message) {
     var userid = {uid: uid}
 
     var xmlObj = new XMLHttpRequest();
-    xmlObj.open('POST', url, true);
+    xmlObj.open('PUT', url, true);
     xmlObj.setRequestHeader("Content-type", "application/json");
     xmlObj.onload = function (e) {
         if (xmlObj.readyState === 4) {
             if (xmlObj.status === 200) {
             	var exemplo=JSON.parse(xmlObj.responseText)
-            	if (exemplo["state"] === 0 && message === 1) {
+            	if (exemplo["state"] === 404 && message === 1) {
             		alert("you are not checked in")
             	} else if(message === 1){
    	                document.getElementById('message').innerHTML = 'You are not in a room '
@@ -142,19 +142,19 @@ function checkinuser(usid ,idr, message) {
     var url = 'http://localhost:8080/api/checkin';
     var data = {uid: usid, roomid: idr};
     var xmlObj = new XMLHttpRequest();
-    xmlObj.open('POST', url, true);
+    xmlObj.open('PUT', url, true);
     xmlObj.setRequestHeader("Content-type", "application/json");
     xmlObj.onload = function (e) {
         if (xmlObj.readyState === 4) {
             if (xmlObj.status === 200) {
             	var exemplo = JSON.parse(xmlObj.responseText)
-            	if (exemplo["state"] === 1){
+            	if (exemplo["state"] === 201){
             		if (message === 1){
                         alert("you are now checked in")
                     }
             		//document.getElementById(idr).innerHTML = 'Sucessfully added!'
                     //document.getElementById(idr).disabled = true;
-            	}else if(exemplo["state"] === -1){
+            	}else if(exemplo["state"] === 400){
             		alert("You are already in this room")
             	}else{
             		alert("You are already in a room")

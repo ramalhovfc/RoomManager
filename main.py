@@ -102,11 +102,11 @@ def show_rooms():
 	id_rooms = { "rooms": rooms, "id": uid }
 	return template(templates.check_in, list = id_rooms, get_url = bottle.get_url)
 
-@bottle.route('/api/checkin', method = "post")
+@bottle.route('/api/checkin', method = "put")
 def check_in_database():
 	return json.dumps(mainImpl.check_in_database_impl(json.load(request.body)))
 
-@bottle.route('/api/checkout', method = "post")
+@bottle.route('/api/checkout', method = "put")
 def check_out_database():
 	return json.dumps(mainImpl.check_out_database_impl(json.load(request.body)))
 
