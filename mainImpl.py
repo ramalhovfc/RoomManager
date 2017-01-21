@@ -117,12 +117,12 @@ def is_room_provided_impl(roomId):
 
 # get userId from username
 def convert_username(username):
-	query = User.query().fetch()
-	for utilizador in query:
-		if username == utilizador.username:
-			return username.userid
+	queryResult = User.query(ndb.GenericProperty('username') == username).fetch()
 
-	return -1
+	if queryResult is None:
+		return -1
+	else:
+		return queryResult.username
 
 def provide_room_impl(roomid, roomname):
 	checked_room = CheckRoom(roomid = int(roomid), userid = [], roomname = roomname, key = ndb.Key(CheckRoom, int(roomid)))

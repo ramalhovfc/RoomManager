@@ -90,7 +90,7 @@ notLoggedIn = """
 """
 
 login_user_doesnt_exists="""
-	The username - {{username}} is does not exist
+	The username {{username}} does not exist
 	<br><br><a href="http://localhost:8080/">Back to login</a>
 """
 

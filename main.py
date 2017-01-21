@@ -17,8 +17,6 @@ debug(True)
 bottle = Bottle()
 
 # TODO feed js url through python
-# TODO normalize endpoints
-# TODO dont get all entities from db. do a filtered query
 
 # servir javascript independentemente do url
 @bottle.route('/static/<filename>', name = 'static')
