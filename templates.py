@@ -1,3 +1,4 @@
+#template for the main page of user
 index = '''
     	<h2>Welcome to Room Management</h2>
     	<form action="/" method="post">
@@ -7,6 +8,7 @@ index = '''
     	</form>
 '''
 
+#template for the home page of the admin
 adminArea = """
 	<h2>Administrator Area</h2>
 	<ol type="1">
@@ -15,6 +17,7 @@ adminArea = """
 	</ol>
 """
 
+#template to show the admin the available rooms and their occupancy
 roomsOcupancy = """
 	<h2>Room Ocupancy</h2>
 	<table>
@@ -33,6 +36,7 @@ roomsOcupancy = """
 	<br><br><a href="http://localhost:8080/admin">Admin menu</a>
 """
 
+#template to show the spaces to the admin
 spaces = """
 <ol type="1">
 	% if (list[0]["type"] == "FLOOR"):
@@ -50,27 +54,31 @@ spaces = """
 <br><a href="http://localhost:8080/admin">Admin Menu</a>
 """
 
+#template after the user correctly logged/signed in 
 logged_in = """
 		<br><a href="http://localhost:8080/user/rooms">List Available Rooms</a>
 
     	% if(list["checked_in"]==0):
         <br><br>You are not in a room <button id="Checkoutb" type="button" disabled onclick=checkoutuser({{list["uid"]}},1)> Check out </button>
     	% else:
-        <br><br><span id="message">You are in a room </span><button id="Checkoutb" type="button" onclick=checkoutuser({{list["uid"]}},1)> Check out </button>
+        <br><br><span id="message">You are in room {{list["checked_in"]}} </span><button id="Checkoutb" type="button" onclick=checkoutuser({{list["uid"]}},1)> Check out </button>
 
 		<script type="text/javascript" src="{{ get_url('static', filename='main.js') }}" ></script>
 """
 
+#template when the user chooses a username already taken
 failed_login="""
 	The username - {{username}} is already in use please choose another one
 	<br><br><a href="http://localhost:8080/">Back to login</a>
 """
 
+#template when the username of the login doesn't exist in the database
 login_user_doesnt_exists="""
 	The username - {{username}} does not exist, create it first
 	<br><br><a href="http://localhost:8080/">Back to login</a>
 """
 
+#template used to list all the available rooms that allow also to check in and see the users on each room
 check_in = """<ol type="1">
 	% for id_sala,name in list["rooms"].items():
 		<li> {{id_sala}} - {{name}} <button id= "{{id_sala}}" type="button" onclick=checkinuser({{list["id"]}},{{id_sala}},1)> Check in </button>
@@ -82,7 +90,7 @@ check_in = """<ol type="1">
 
 <script type="text/javascript" src="{{ get_url('static', filename='main.js') }}" ></script>
 """
-
+#template for the room to provide
 provide = """
 <ol>
 	Type : {{list["type"]}} <br>

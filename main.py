@@ -95,7 +95,7 @@ def buildings(id_space):
 def is_room_provided(roomId):
 	return json.dumps(mainImpl.is_room_provided_impl(roomId))
 
-@bottle.route('/user/rooms')
+@bottle.route('/user/rooms', method ="get")
 def show_rooms():
 	uid = request.get_cookie("userId")
 	rooms = mainImpl.list_available_rooms()
@@ -110,7 +110,7 @@ def check_in_database():
 def check_out_database():
 	return json.dumps(mainImpl.check_out_database_impl(json.load(request.body)))
 
-@bottle.route('/api/listusers/<id_sala:int>')
+@bottle.route('/api/listusers/<id_sala:int>', method = "get")
 def show_listed_users(id_sala):
 	return json.dumps(mainImpl.show_listed_users_impl(id_sala))
 
