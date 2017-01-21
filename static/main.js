@@ -41,7 +41,7 @@ function provideRoom(roomId, roomName) {
 	console.log('providing id', roomId)
 	console.log('providing name', roomName)
 
-    var url = 'http://localhost:8080/provideRoom/' + roomId + '/' + roomName;
+    var url = 'http://localhost:8080/api/provideRoom/' + roomId + '/' + roomName;
 
     var xmlObj = new XMLHttpRequest();
     xmlObj.open('POST', url, true);
@@ -71,13 +71,8 @@ function provideRoom(roomId, roomName) {
 }
 
 function listusers(id_sala){
-	/*var url = 'http://localhost:8080/api/listusers/'+id_sala;
-	//window.location.href= url
-	var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", url, true);
-    xhttp.setRequestHeader("Content-type", "application/json");
-    xhttp.send();*/
     var url = 'http://localhost:8080/api/listusers/'+id_sala;
+
     var xmlObj = new XMLHttpRequest();
     xmlObj.open('GET', url, true);
     xmlObj.setRequestHeader("Content-type", "application/json");
@@ -85,26 +80,21 @@ function listusers(id_sala){
         if (xmlObj.readyState === 4) {
             if (xmlObj.status === 200) {
             	var exemplo=JSON.parse(xmlObj.responseText)
-            	if (exemplo["state"]== 0){
+            	if (exemplo["state"] === 0){
             		alert("The room has no users");
-            	}else{
-            		//alert(JSON.stringify(exemplo["users"]));
+            	} else {
                     var users = []
                     for (var key in exemplo["users"]){
                         users.push(exemplo["users"][key])
                     }
                     alert(users)
             	}
-            	//window.location.href= url
             } else {
                 document.getElementById(id_sala+s).innerHTML = 'Something went wrong:' + xmlObj.statusText;
                 console.error(xmlObj);
             }
         }
     };
-    /*xmlObj.onprogress = function (e) {
-        document.getElementById(id_sala+s).innerHTML += '.'
-    }*/
     xmlObj.onerror = function (e) {
         document.getElementById(id_sala+s).innerHTML = 'Something went wrong:' + e.statusText;
         console.error(e);
@@ -112,7 +102,6 @@ function listusers(id_sala){
     xmlObj.send();
 }
 function checkoutuser(uid, message) {
-
     var url = 'http://localhost:8080/api/checkout';
     var userid = {uid: uid}
 
@@ -123,9 +112,9 @@ function checkoutuser(uid, message) {
         if (xmlObj.readyState === 4) {
             if (xmlObj.status === 200) {
             	var exemplo=JSON.parse(xmlObj.responseText)
-            	if (exemplo["state"]==0 && message === 1){
+            	if (exemplo["state"] === 0 && message === 1) {
             		alert("you are not checked in")
-            	}else if(message === 1){
+            	} else if(message === 1){
    	                document.getElementById('message').innerHTML = 'You are not in a room '
             		alert("you were checked out")
             	}
@@ -154,20 +143,20 @@ function checkinuser(usid ,idr, message) {
     xmlObj.onload = function (e) {
         if (xmlObj.readyState === 4) {
             if (xmlObj.status === 200) {
-            	var exemplo=JSON.parse(xmlObj.responseText)
-            	if (exemplo["state"]==1){
-            		if (message==1){
+            	var exemplo = JSON.parse(xmlObj.responseText)
+            	if (exemplo["state"] === 1){
+            		if (message === 1){
                         alert("you are now checked in")
                     }
             		document.getElementById(idr).innerHTML = 'Sucessfully added!'
             		//document.getElementById(idr).disabled = true;
-            	}else if(exemplo["state"]==-1){
+            	}else if(exemplo["state"] === -1){
             		alert("You are already in this room")
             	}else{
             		alert("You are already in a room")
             		checkoutuser(usid, 0)
             		alert("You are in a new room now")
-            		checkinuser(usid, idr,0)
+            		checkinuser(usid, idr, 0)
             	}
             } else {
                 document.getElementById(idr).innerHTML = 'Something went wrong:' + xmlObj.statusText;
@@ -175,9 +164,6 @@ function checkinuser(usid ,idr, message) {
             }
         }
     };
-    /*xmlObj.onprogress = function (e) {
-        document.getElementById(idr).innerHTML += '.'
-    }*/
     xmlObj.onerror = function (e) {
         document.getElementById(idr).innerHTML = 'Something went wrong:' + e.statusText;
         console.error(e);
