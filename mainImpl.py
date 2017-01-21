@@ -73,7 +73,7 @@ def check_in_database_impl(data):
 
 		key_cr = ndb.Key(CheckRoom, int(roomid))
 		room = key_cr.get()
-		if exemplo != None: #there were users in the rooms add the new one
+		if room != None: #there were users in the rooms add the new one
 			buf = room.userid
 			buf.append(int(userid))
 			room.userid=buf
