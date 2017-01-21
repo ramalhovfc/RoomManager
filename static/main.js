@@ -44,7 +44,7 @@ function provideRoom(roomId, roomName) {
     var url = 'http://localhost:8080/api/spaces/provide/' + roomId + '/' + roomName;
 
     var xmlObj = new XMLHttpRequest();
-    xmlObj.open('POST', url, true);
+    xmlObj.open('PUT', url, true);
     xmlObj.setRequestHeader("Content-type", "application/json");
     xmlObj.onload = function (e) {
         if (xmlObj.readyState === 4) {

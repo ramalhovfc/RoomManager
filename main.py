@@ -24,12 +24,12 @@ def server_static(filename):
 	return static_file(filename, root = 'static')
 
 # ecra inicial e login do utilizador
-@bottle.route('/')
+@bottle.route('/', method = "get")
 def home():
 	response.set_cookie('userId', '', expires = 0)
 	return templates.index
 
-@bottle.route('/logout')
+@bottle.route('/logout', method = "get")
 def do_logout():
 	response.set_cookie('userId', '', expires = 0)
 	redirect("/")
@@ -64,7 +64,7 @@ def do_signin():
 		response.set_cookie("userId", str(userId))
 		redirect("/user")
 
-@bottle.route('/user')
+@bottle.route('/user', method ="get")
 def user_actions():
 	userId = request.get_cookie("userId")
 
@@ -75,7 +75,7 @@ def user_actions():
 
 	return template(templates.logged_in, list = user_state, get_url = bottle.get_url)
 
-@bottle.route('/admin')
+@bottle.route('/admin', method = "get")
 def adminArea():
 	userId = request.get_cookie("userId")
 	if userId != "0":
@@ -91,15 +91,19 @@ def list_spaces():
 		return template(templates.errorGettingSpaces)
 	return template(templates.spaces, list = building, get_url = bottle.get_url)
 
-@bottle.route('/admin/spaces/ocupancy')
+@bottle.route('/api/admin/spaces/ocupancy', method = "get")
+@bottle.route('/admin/spaces/ocupancy', method = "get")
 def roomsOcupancy():
-	return template(templates.roomsOcupancy, list = mainImpl.rooms_ocupancy_impl(), get_url = bottle.get_url)
+	if request['bottle.route'].rule == '/admin/spaces/ocupancy': # accessed from the browser, return the template
+		return template(templates.roomsOcupancy, list = mainImpl.rooms_ocupancy_impl(), get_url = bottle.get_url)
+	elif request['bottle.route'].rule == '/api/admin/spaces/ocupancy':
+		return json.dumps(mainImpl.rooms_ocupancy_impl())
 
-@bottle.route('/api/spaces/provide/<roomId>/<roomName>', method= "post")
+@bottle.route('/api/spaces/provide/<roomId>/<roomName>', method = "put")
 def provideRoom(roomId, roomName):
 	mainImpl.provide_room_impl(roomId, roomName)
 
-@bottle.route('/admin/space/<id_space>')
+@bottle.route('/admin/space/<id_space>', method = "get")
 def buildings(id_space):
 	try:
 		building = fenixFetcher.getSpaceById(id_space)
@@ -111,27 +115,24 @@ def buildings(id_space):
 	else:
 		return template(templates.provide, list = building, get_url = bottle.get_url)
 
-@bottle.route('/admin/spaces/provided/<roomId>')
+@bottle.route('/admin/spaces/provided/<roomId>', method = "get")
 def is_room_provided(roomId):
 	return json.dumps({"roomProvided": mainImpl.is_room_provided_impl(roomId)})
 
-@bottle.route('/api/user/rooms', method = 'get')
-@bottle.route('/user/rooms', method ="get")
+@bottle.route('/api/user/rooms', method = "get")
+@bottle.route('/user/rooms', method = "get")
 def show_rooms():
 	uid = request.get_cookie("userId")
 	rooms = mainImpl.list_available_rooms()
 	id_rooms = { "rooms": rooms, "id": uid }
 
-	if (request['bottle.route'].rule == '/user/rooms'): #accessed from the browser, return the template
+	if request['bottle.route'].rule == '/user/rooms': # accessed from the browser, return the template
 		return template(templates.check_in, list = id_rooms, get_url = bottle.get_url) 
-	elif (request['bottle.route'].rule == '/api/user/rooms'): #just the rest answer
-		return id_rooms
-
+	elif request['bottle.route'].rule == '/api/user/rooms': # just the rest answer
+		return json.dumps(id_rooms)
 
 @bottle.route('/api/checkin', method = "put")
 def check_in_database():
-	print "------------------------------------"
-	print json.load(request.body)
 	return json.dumps(mainImpl.check_in_database_impl(json.load(request.body)))
 
 @bottle.route('/api/checkout', method = "put")
