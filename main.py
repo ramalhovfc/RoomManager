@@ -58,7 +58,6 @@ def do_api_login():
 	if username == "":
 		return HTTPResponse(status = 400, body = "Empty username")
 
-	logging.error("username:"+username)
 	userId = mainImpl.login_user_impl(username)
 
 	if userId < 0: # username does not exist

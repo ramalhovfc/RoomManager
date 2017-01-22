@@ -87,9 +87,9 @@ def check_in_database_impl(data):
 			return {'state': 400}
 		else: #user was already logged in a room first logout then log in in the new one
 			response=check_out_database_impl({'uid':userid})
-			if (response['state']==200):
-				response2=check_in_database_impl({'uid':userid, 'roomid':roomid})
-				if (response2['state']==201):
+			if response['state'] == 200:
+				response2 = check_in_database_impl({'uid':userid, 'roomid':roomid})
+				if response2['state'] == 201:
 					return {'state':200}
 				else:
 					return {'state':400}
