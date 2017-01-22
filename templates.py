@@ -124,6 +124,7 @@ provide = """
 	Campus : {{list["parentSpace"]["topLevelSpace"]["name"]}}<br> <br>
 
 	<button id="provideButton" onclick="provideRoom({{list["id"]}}, \'{{list["name"]}}\')" disabled	>Checking if room is already provided...</button>
+	<button id="deleteButton" onclick="deleteRoom({{list["id"]}})" disabled	>Delete</button>
 
 	<br><br><a href="http://{{serverHost}}{{serverPort}}/admin">Admin menu</a>
 

@@ -12,10 +12,11 @@ function isRoomProvided(roomId) {
                 console.log('sucesss', xmlObj);
                 var jsonResponse = JSON.parse(xmlObj.responseText);
                 if (!jsonResponse.roomProvided) {
-                    document.getElementById('provideButton').innerHTML = 'Provide room'
+                    document.getElementById('provideButton').innerHTML = 'Add'
                     document.getElementById('provideButton').disabled = false;
                 } else {
                     document.getElementById('provideButton').innerHTML = 'Room already provided'
+                    document.getElementById('deleteButton').disabled = false
                 }
             } else {
                 document.getElementById('provideButton').innerHTML = 'Something went wrong: ' + xmlObj.statusText;
@@ -52,6 +53,8 @@ function provideRoom(roomId, roomName) {
                 console.log('sucesss', xmlObj);
                 document.getElementById('provideButton').innerHTML = 'Sucessfully added!'
                 document.getElementById('provideButton').disabled = true;
+                document.getElementById('deleteButton').innerHTML = 'Delete';
+                document.getElementById('deleteButton').disabled = false;
             } else {
                 document.getElementById('provideButton').innerHTML = 'Something went wrong: ' + xmlObj.statusText;
                 console.error(xmlObj);
@@ -67,6 +70,38 @@ function provideRoom(roomId, roomName) {
     };
 
     document.getElementById('provideButton').innerHTML = 'Adding...'
+    xmlObj.send();
+}
+
+function deleteRoom(roomId) {
+    var url = 'http://' + document.roomManager.serverHost + document.roomManager.serverPort + '/api/spaces/provide/' + roomId;
+
+    var xmlObj = new XMLHttpRequest();
+    xmlObj.open('DELETE', url, true);
+    xmlObj.setRequestHeader("Content-type", "application/json");
+    xmlObj.onload = function (e) {
+        if (xmlObj.readyState === 4) {
+            if (xmlObj.status === 200) {
+                console.log('sucesss', xmlObj);
+                document.getElementById('deleteButton').innerHTML = 'Sucessfully deleted!'
+                document.getElementById('deleteButton').disabled = true;
+                document.getElementById('provideButton').disabled = false;
+                document.getElementById('provideButton').innerHTML = 'Add';
+            } else {
+                document.getElementById('deleteButton').innerHTML = 'Something went wrong: ' + xmlObj.statusText;
+                console.error(xmlObj);
+            }
+        }
+    };
+    xmlObj.onprogress = function (e) {
+        document.getElementById('deleteButton').innerHTML += '.'
+    }
+    xmlObj.onerror = function (e) {
+        document.getElementById('deleteButton').innerHTML = 'Something went wrong: ' + e.statusText;
+        console.error(e);
+    };
+
+    document.getElementById('deleteButton').innerHTML = 'Deleting...'
     xmlObj.send();
 }
 

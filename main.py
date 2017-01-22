@@ -143,6 +143,10 @@ def roomsOcupancy():
 def provideRoom(roomId, roomName):
 	mainImpl.provide_room_impl(roomId, roomName)
 
+@bottle.route('/api/spaces/provide/<roomId>', method = "delete")
+def provideRoom(roomId):
+	mainImpl.delete_room_impl(roomId)
+
 @bottle.route('/admin/space/<id_space>', method = "get")
 def buildings(id_space):
 	try:

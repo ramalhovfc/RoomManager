@@ -144,13 +144,18 @@ def convert_username(username):
 	queryResult = User.query(ndb.GenericProperty('username') == username).fetch()
 
 	if queryResult is None:
-		return -1 #username didn't exist
+		return -1 # username didn't exist
 	else:
 		return queryResult.username
 
 def provide_room_impl(roomid, roomname):
 	checked_room = CheckRoom(roomid = int(roomid), userid = [], roomname = roomname, key = ndb.Key(CheckRoom, int(roomid)))
 	checked_room.saveToCloud()
+
+def delete_room_impl(roomid):
+	key = ndb.Key(CheckRoom, int(roomid))
+	room = key.get()
+	room.key.delete()
 
 # show available rooms to check_in
 def list_available_rooms():
@@ -161,16 +166,15 @@ def list_available_rooms():
 
 	return available_rooms
 
-#verify if the user is in a room
+# verify if the user is in a room
 def is_user_checked_in(userId):
 	key = ndb.Key(User, int(userId))
 	user = key.get()
 
-	if user.checked_in == -1: #the user was not in a room
+	if user.checked_in == -1: # the user was not in a room
 		return {'state':0}
 	else:
 		key_r = ndb.Key(CheckRoom, int(user.checked_in))
 		room = key_r.get()
-		print room
 
-		return {'state':1, 'userid':user.checked_in, 'roomname':room.roomname} #return the id of the room where the user is
+		return {'state': 1, 'userid': user.checked_in, 'roomname': room.roomname} # return the id of the room where the user is
