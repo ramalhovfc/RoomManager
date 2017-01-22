@@ -2,7 +2,6 @@ from bottle import Bottle, template, request, response, debug, static_file, redi
 import requests_toolbelt.adapters.appengine
 import templates
 import json
-import logging
 
 requests_toolbelt.adapters.appengine.monkeypatch()
 
@@ -16,22 +15,24 @@ debug(True)
 # Create the Bottle WSGI application.
 bottle = Bottle()
 
-# servir javascript independentemente do url
+# serve static files, url independant
 @bottle.route('/static/<filename>', name = 'static')
 def server_static(filename):
 	return static_file(filename, root = 'static')
 
-# ecra inicial e login do utilizador
+# initial login/signin screen
 @bottle.route('/', method = "get")
 def home():
 	response.set_cookie('userId', '', expires = 0)
 	return templates.index
 
+# logout endpoint. clear cookie and redirect to initial screen
 @bottle.route('/logout', method = "get")
 def do_logout():
 	response.set_cookie('userId', '', expires = 0)
 	redirect("/")
 
+# login endpoint
 @bottle.route('/login', method = "post")
 def do_login():
 	username = request.forms.get('username')
@@ -48,6 +49,7 @@ def do_login():
 		response.set_cookie("userId", str(userId))
 		redirect("/user")
 
+# api login endpoint
 @bottle.route('/api/login', method = "post")
 def do_api_login():
 	try:
@@ -66,6 +68,7 @@ def do_api_login():
 	response.set_cookie("userId", str(userId))
 	return json.dumps({"state": 200, "msg": userId})
 
+# signin endpoint
 @bottle.route('/signin', method = "post")
 def do_signin():
 	username = request.forms.get('username')
@@ -81,6 +84,7 @@ def do_signin():
 		response.set_cookie("userId", str(userId))
 		redirect("/user")
 
+# api signin endpoint
 @bottle.route('/api/signin', method = "post")
 def do_api_signin():
 	try:
@@ -99,7 +103,8 @@ def do_api_signin():
 	response.set_cookie("userId", str(userId))
 	return json.dumps({"state": 200, "msg": username})
 
-@bottle.route('/user', method ="get")
+# main user page
+@bottle.route('/user', method = "get")
 def user_actions():
 	userId = request.get_cookie("userId")
 
@@ -114,6 +119,7 @@ def user_actions():
 
 	return template(templates.logged_in, list = user_state, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 
+# main admin page
 @bottle.route('/admin', method = "get")
 def adminArea():
 	userId = request.get_cookie("userId")
@@ -122,6 +128,7 @@ def adminArea():
 
 	return template(templates.adminArea, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 
+# browser spaces screen
 @bottle.route('/admin/spaces', method = "get")
 def list_spaces():
 	try:
@@ -130,6 +137,7 @@ def list_spaces():
 		return template(templates.errorGettingSpaces, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 	return template(templates.spaces, list = building, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 
+# list room ocupancy page
 @bottle.route('/api/admin/spaces/ocupancy', method = "get")
 @bottle.route('/admin/spaces/ocupancy', method = "get")
 def roomsOcupancy():
@@ -138,14 +146,17 @@ def roomsOcupancy():
 	elif request['bottle.route'].rule == '/api/admin/spaces/ocupancy':
 		return json.dumps(mainImpl.rooms_ocupancy_impl())
 
+# endpoint to provide/add a room
 @bottle.route('/api/spaces/provide/<roomId>/<roomName>', method = "post")
 def provideRoom(roomId, roomName):
 	mainImpl.provide_room_impl(roomId, roomName)
 
+# endpoint to delete a room
 @bottle.route('/api/spaces/provide/<roomId>', method = "delete")
 def provideRoom(roomId):
 	mainImpl.delete_room_impl(roomId)
 
+# admin browse spaces page
 @bottle.route('/admin/space/<id_space>', method = "get")
 def buildings(id_space):
 	try:
@@ -158,10 +169,12 @@ def buildings(id_space):
 	else:
 		return template(templates.provide, list = building, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 
+# endpoint to tell if a room is provided or not
 @bottle.route('/admin/spaces/provided/<roomId>', method = "get")
 def is_room_provided(roomId):
 	return json.dumps({"roomProvided": mainImpl.is_room_provided_impl(roomId)})
 
+# page to see where the user can checkin in rooms and see where he is checked in
 @bottle.route('/api/user/rooms', method = "get")
 @bottle.route('/user/rooms', method = "get")
 def show_rooms():
@@ -174,14 +187,17 @@ def show_rooms():
 	elif request['bottle.route'].rule == '/api/user/rooms': # just the rest answer
 		return json.dumps(id_rooms)
 
+# endpoint to provide checkin functionality
 @bottle.route('/api/checkin', method = "put")
 def check_in_database():
 	return json.dumps(mainImpl.check_in_database_impl(json.load(request.body)))
 
+# endpoint to provide checkout functionality
 @bottle.route('/api/checkout', method = "put")
 def check_out_database():
 	return json.dumps(mainImpl.check_out_database_impl(json.load(request.body)))
 
+# endpoint to list users that checked-in in a room
 @bottle.route('/api/listusers/<id_sala:int>', method = "get")
 def show_listed_users(id_sala):
 	return json.dumps(mainImpl.show_listed_users_impl(id_sala))

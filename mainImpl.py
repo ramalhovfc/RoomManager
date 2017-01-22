@@ -3,15 +3,14 @@ from google.appengine.ext import ndb
 from User import User
 from CheckRoom import CheckRoom
 
+# signin functionality implementation
 def signin_user_impl(username):
 	max_userId = 0
 	if username != "admin":
 		query = User.query().fetch()
-		print query
 		for utilizador in query:
-			print utilizador
-			if utilizador.userid>max_userId:
-				max_userId=utilizador.userid
+			if utilizador.userid > max_userId:
+				max_userId = utilizador.userid
 			if utilizador.username == username:
 				return -1
 		max_userId += 1
@@ -23,6 +22,7 @@ def signin_user_impl(username):
 		user_exemplo.saveToCloud()
 		return 0
 
+# login functionality implementation
 def login_user_impl(username):
 	query = User.query().fetch()
 	for utilizador in query:
@@ -31,7 +31,7 @@ def login_user_impl(username):
 
 	return -1
 
-#show the users in the room
+# show the users in a room
 def show_listed_users_impl(id_sala):
 	key = ndb.Key(CheckRoom, int(id_sala))
 	room = key.get()
@@ -46,6 +46,7 @@ def show_listed_users_impl(id_sala):
 			users[int(userident)] = user_all.username
 		return {'state': 200, 'users': users} # there were users in the room, return them
 
+# list all rooms ocupancy
 def rooms_ocupancy_impl():
 	checkIns = CheckRoom.query().fetch()
 
@@ -55,7 +56,7 @@ def rooms_ocupancy_impl():
 
 	return checkInByRoom
 
-#check the user in the room if is a diferent one
+# check the user in the room if is a diferent one
 def check_in_database_impl(data):
 	roomid = data["roomid"]
 	userid = data["uid"]
@@ -83,10 +84,10 @@ def check_in_database_impl(data):
 
 			return {'state': 201}
 
-		elif user.checked_in == int(roomid): #user try to log in the same room
+		elif user.checked_in == int(roomid): # user try to log in the same room
 			return {'state': 400}
-		else: #user was already logged in a room first logout then log in in the new one
-			response=check_out_database_impl({'uid':userid})
+		else: # user was already logged in a room first logout then log in in the new one
+			response = check_out_database_impl({'uid':userid})
 			if response['state'] == 200:
 				response2 = check_in_database_impl({'uid':userid, 'roomid':roomid})
 				if response2['state'] == 201:
@@ -95,11 +96,12 @@ def check_in_database_impl(data):
 					return {'state':400}
 			else:
 				return {'state': 400}
+
 			return {'state': 409}
 	else:
 		return {'state': 404}
 
-#checkout the user from the room if it is in one
+# checkout the user from the room if it is in one
 def check_out_database_impl(body):
 	userid = body["uid"]
 
@@ -126,6 +128,7 @@ def check_out_database_impl(body):
 	else:
 		return {'state': 404}
 
+# check if a room was previously added
 def is_room_provided_impl(roomId):
 	try:
 		roomIdParsed = int(roomId)
@@ -148,10 +151,12 @@ def convert_username(username):
 	else:
 		return queryResult.username
 
+# add room functionality implementation
 def provide_room_impl(roomid, roomname):
 	checked_room = CheckRoom(roomid = int(roomid), userid = [], roomname = roomname, key = ndb.Key(CheckRoom, int(roomid)))
 	checked_room.saveToCloud()
 
+# delete room functionality implementation
 def delete_room_impl(roomid):
 	key = ndb.Key(CheckRoom, int(roomid))
 	room = key.get()

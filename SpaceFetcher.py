@@ -1,7 +1,7 @@
 import json
 import requests
 
-""" Gets rooms from an external system """
+# Gets rooms from an external system
 class SpaceFetcher:
 	def __init__(self, endpoint = "https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces"):
 		self.endpoint = endpoint
