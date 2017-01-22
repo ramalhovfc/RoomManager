@@ -38,7 +38,7 @@ def do_login():
 	userId = mainImpl.login_user_impl(username)
 
 	if userId < 0: # username does not exist
-		return template(templates.login_user_doesnt_exist, username = username, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = request.get_header('port'))
+		return template(templates.login_user_doesnt_exist, username = username, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 
 	elif userId == 0: # admin
 		response.set_cookie("userId", str(userId))
@@ -77,7 +77,7 @@ def do_signin():
 	userId = mainImpl.signin_user_impl(username)
 
 	if userId < 0: # username already exists
-		return template(templates.failed_login, username = username, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = request.get_header('port'))
+		return template(templates.failed_login, username = username, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 
 	elif userId == 0: # admin
 		response.set_cookie("userId", str(userId))
@@ -109,7 +109,7 @@ def user_actions():
 	userId = request.get_cookie("userId")
 
 	if userId is None or userId == "" or userId == "0":
-		return template(templates.notLoggedIn, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = request.get_header('port'))
+		return template(templates.notLoggedIn, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 
 	log_in=mainImpl.is_user_checked_in(userId)
 	if(log_in['state']==0):
@@ -117,29 +117,29 @@ def user_actions():
 	else:
 		user_state = { "uid": userId, "checked_in": log_in['userid'], "name": log_in['roomname']}
 
-	return template(templates.logged_in, list = user_state, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = request.get_header('port'))
+	return template(templates.logged_in, list = user_state, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 
 @bottle.route('/admin', method = "get")
 def adminArea():
 	userId = request.get_cookie("userId")
 	if userId != "0":
-		return template(templates.notAdmin, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = request.get_header('port'))
+		return template(templates.notAdmin, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 
-	return template(templates.adminArea, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = request.get_header('port'))
+	return template(templates.adminArea, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 
 @bottle.route('/admin/spaces', method = "get")
 def list_spaces():
 	try:
 		building = fenixFetcher.getSpaceById()
 	except:
-		return template(templates.errorGettingSpaces, serverHost = request.get_header('host'), serverPort = request.get_header('port'))
-	return template(templates.spaces, list = building, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = request.get_header('port'))
+		return template(templates.errorGettingSpaces, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
+	return template(templates.spaces, list = building, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 
 @bottle.route('/api/admin/spaces/ocupancy', method = "get")
 @bottle.route('/admin/spaces/ocupancy', method = "get")
 def roomsOcupancy():
 	if request['bottle.route'].rule == '/admin/spaces/ocupancy': # accessed from the browser, return the template
-		return template(templates.roomsOcupancy, list = mainImpl.rooms_ocupancy_impl(), get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = request.get_header('port'))
+		return template(templates.roomsOcupancy, list = mainImpl.rooms_ocupancy_impl(), get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 	elif request['bottle.route'].rule == '/api/admin/spaces/ocupancy':
 		return json.dumps(mainImpl.rooms_ocupancy_impl())
 
@@ -152,12 +152,12 @@ def buildings(id_space):
 	try:
 		building = fenixFetcher.getSpaceById(id_space)
 	except:
-		return template(templates.errorGettingSpaces, serverHost = request.get_header('host'), serverPort = request.get_header('port'))
+		return template(templates.errorGettingSpaces, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 
 	if building["containedSpaces"] != []:
-		return template(templates.spaces, list = building["containedSpaces"], get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = request.get_header('port'))
+		return template(templates.spaces, list = building["containedSpaces"], get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 	else:
-		return template(templates.provide, list = building, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = request.get_header('port'))
+		return template(templates.provide, list = building, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 
 @bottle.route('/admin/spaces/provided/<roomId>', method = "get")
 def is_room_provided(roomId):
@@ -171,7 +171,7 @@ def show_rooms():
 	id_rooms = { "rooms": rooms, "id": uid }
 
 	if request['bottle.route'].rule == '/user/rooms': # accessed from the browser, return the template
-		return template(templates.check_in, list = id_rooms, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = request.get_header('port'))
+		return template(templates.check_in, list = id_rooms, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 	elif request['bottle.route'].rule == '/api/user/rooms': # just the rest answer
 		return json.dumps(id_rooms)
 

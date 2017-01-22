@@ -1,7 +1,7 @@
 function isRoomProvided(roomId) {
     console.log('checking id', roomId)
 
-    var url = 'http://localhost:8080/admin/spaces/provided/' + roomId;
+    var url = 'http://' + document.roomManager.serverHost + document.roomManager.serverPort + '/admin/spaces/provided/' + roomId;
 
     var xmlObj = new XMLHttpRequest();
     xmlObj.open('GET', url, true);
@@ -41,7 +41,7 @@ function provideRoom(roomId, roomName) {
 	console.log('providing id', roomId)
 	console.log('providing name', roomName)
 
-    var url = 'http://localhost:8080/api/spaces/provide/' + roomId + '/' + roomName;
+    var url = 'http://' + document.roomManager.serverHost + document.roomManager.serverPort + '/api/spaces/provide/' + roomId + '/' + roomName;
 
     var xmlObj = new XMLHttpRequest();
     xmlObj.open('POST', url, true);
@@ -71,7 +71,7 @@ function provideRoom(roomId, roomName) {
 }
 
 function listusers(id_sala){
-    var url = 'http://localhost:8080/api/listusers/'+id_sala;
+    var url = 'http://' + document.roomManager.serverHost + document.roomManager.serverPort + '/api/listusers/' + id_sala;
 
     var xmlObj = new XMLHttpRequest();
     xmlObj.open('GET', url, true);
@@ -103,7 +103,7 @@ function listusers(id_sala){
 }
 function checkoutuser(uid, message) {
     var checkoutButton = document.getElementById('Checkoutb');
-    var url = 'http://localhost:8080/api/checkout';
+    var url = 'http://' + document.roomManager.serverHost + document.roomManager.serverPort + '/api/checkout';
     var userid = {uid: uid}
 
     var xmlObj = new XMLHttpRequest();
@@ -139,7 +139,7 @@ function checkoutuser(uid, message) {
     xmlObj.send(JSON.stringify(userid));
 }
 function checkinuser(usid ,idr, message) {
-    var url = 'http://localhost:8080/api/checkin';
+    var url = 'http://' + document.roomManager.serverHost + document.roomManager.serverPort + '/api/checkin';
     var data = {uid: usid, roomid: idr};
     var xmlObj = new XMLHttpRequest();
     xmlObj.open('PUT', url, true);
