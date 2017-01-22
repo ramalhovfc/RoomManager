@@ -167,6 +167,10 @@ def is_user_checked_in(userId):
 	user = key.get()
 
 	if user.checked_in == -1: #the user was not in a room
-		return 0
+		return {'state':0}
 	else:
-		return user.checked_in #return the id of the room where the user is
+		key_r = ndb.Key(CheckRoom, int(user.checked_in))
+		room = key_r.get()
+		print room
+
+		return {'state':1, 'userid':user.checked_in, 'roomname':room.roomname} #return the id of the room where the user is
