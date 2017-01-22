@@ -107,11 +107,11 @@ def user_actions():
 	if userId is None or userId == "" or userId == "0":
 		return template(templates.notLoggedIn, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 
-	log_in=mainImpl.is_user_checked_in(userId)
-	if(log_in['state']==0):
-		user_state = { "uid": userId, "checked_in": 0, "name": "no room"}
+	log_in = mainImpl.is_user_checked_in(userId)
+	if log_in['state'] == 0:
+		user_state = {"uid": userId, "checked_in": 0, "name": "no room"}
 	else:
-		user_state = { "uid": userId, "checked_in": log_in['userid'], "name": log_in['roomname']}
+		user_state = {"uid": userId, "checked_in": log_in['userid'], "name": log_in['roomname']}
 
 	return template(templates.logged_in, list = user_state, get_url = bottle.get_url, serverHost = request.get_header('host'), serverPort = ':8080' if request.get_header('host') == 'localhost' else '')
 
