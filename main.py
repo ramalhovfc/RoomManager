@@ -53,18 +53,18 @@ def do_api_login():
 	try:
 		username = str(request.POST.get("username"))
 	except:
-		return HTTPResponse(status = 400, body = "No username provided")
+		return json.dumps({"state": 400, "msg": "No username provided"})
 
 	if username == "":
-		return HTTPResponse(status = 400, body = "Empty username")
+		return json.dumps({"state": 400, "msg": "Empty username"})
 
 	userId = mainImpl.login_user_impl(username)
 
 	if userId < 0: # username does not exist
-		return HTTPResponse(status = 404, body = "User does not exist")
+		return json.dumps({"state": 404, "msg": "User does not exist"})
 
 	response.set_cookie("userId", str(userId))
-	return HTTPResponse(status = 200, body = userId)
+	return json.dumps({"state": 200, "msg": userId})
 
 @bottle.route('/signin', method = "post")
 def do_signin():
@@ -86,18 +86,18 @@ def do_api_signin():
 	try:
 		username = str(request.POST.get("username"))
 	except:
-		return HTTPResponse(status = 400, body = "No username provided")
+		return json.dumps({"state": 400, "msg": "No username provided"})
 
 	if username == "":
-		return HTTPResponse(status = 400, body = "Empty username")
+		return json.dumps({"state": 400, "msg": "Empty username"})
 
 	userId = mainImpl.signin_user_impl(username)
 
 	if userId < 0: # username already exists
-		return HTTPResponse(status = 409, body = "Username already exists")
+		return json.dumps({"state": 409, "msg": "Username already exists"})
 
 	response.set_cookie("userId", str(userId))
-	return HTTPResponse(status = 200, body = username)
+	return json.dumps({"state": 200, "msg": username})
 
 @bottle.route('/user', method ="get")
 def user_actions():
