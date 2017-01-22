@@ -51,25 +51,21 @@ def do_login():
 @bottle.route('/api/login', method = "post")
 def do_api_login():
 	try:
-		logging.error("11111111111111111111111111111")
-		logging.error(request)
-		body = json.load(request.body)
+		username = str(request.POST.get("username"))
 	except:
-		logging.error("3333333333333333")
-		return HTTPResponse(status = 400)
+		return HTTPResponse(status = 400, body = "No username provided")
 
-	logging.error("2222222222222222222222")
-	if body["username"] is None or body["username"] == "":
-		return HTTPResponse(status = 400)
+	if username == "":
+		return HTTPResponse(status = 400, body = "Empty username")
 
-	username = body["username"]
+	logging.error("username:"+username)
 	userId = mainImpl.login_user_impl(username)
 
 	if userId < 0: # username does not exist
 		return HTTPResponse(status = 404, body = "User does not exist")
 
 	response.set_cookie("userId", str(userId))
-	HTTPResponse(status = 200, body = userId)
+	return HTTPResponse(status = 200, body = userId)
 
 @bottle.route('/signin', method = "post")
 def do_signin():
@@ -89,20 +85,20 @@ def do_signin():
 @bottle.route('/api/signin', method = "post")
 def do_api_signin():
 	try:
-		body = json.load(request.body)
+		username = str(request.POST.get("username"))
 	except:
-		return HTTPResponse(status = 400)
+		return HTTPResponse(status = 400, body = "No username provided")
 
-	if body["username"] is None or body["username"] == "":
-		return HTTPResponse(status = 400)
+	if username == "":
+		return HTTPResponse(status = 400, body = "Empty username")
 
-	username = body["username"]
 	userId = mainImpl.signin_user_impl(username)
 
 	if userId < 0: # username already exists
 		return HTTPResponse(status = 409, body = "Username already exists")
 
 	response.set_cookie("userId", str(userId))
+	return HTTPResponse(status = 200, body = username)
 
 @bottle.route('/user', method ="get")
 def user_actions():
